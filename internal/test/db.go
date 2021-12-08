@@ -2,7 +2,6 @@ package test
 
 import (
 	dbx "github.com/go-ozzo/ozzo-dbx"
-	_ "github.com/lib/pq" // initialize posgresql for test
 	"github.com/tvitcom/czthree/internal/config"
 	"github.com/tvitcom/czthree/pkg/dbcontext"
 	"github.com/tvitcom/czthree/pkg/log"

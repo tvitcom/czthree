@@ -29,7 +29,7 @@
 ## Настройка
 
 1. создать mysql бд czthree и пользователя czthree с паролем.
-2. переиеновать файл configs/_dev.yml в ./configs/dev.yml
+2. переименовать файл configs/_dev.yml в ./configs/dev.yml
 3. прописать пароль для соединения с бд
 4. импортировать дамп ./data/czthree_db_init.sql
 5. инициализировать go mod командой: go mod tidy

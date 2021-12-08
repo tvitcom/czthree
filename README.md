@@ -21,6 +21,18 @@
 - Go 1.16.9(max - bug occured with jose2go with go1.16.11)
 - MySql 8.x (no ssl)
 - Linux x32,x64
+- Утилита make (для обработки файла Makefile)
 
 Для выполнения работы используются https://github.com/qiangxue/go-rest-api и некоторые важные папки из https://github.com/golang-standards/project-layout
 Некоторые свои изменения я опсал в своем темплейте https://github.com/tvitcom/fusion-framework и применяю его в своих пет проектах.
+
+## Настройка
+
+1. создать mysql бд czthree и пользователя czthree с паролем.
+2. переиеновать файл configs/_dev.yml в ./configs/dev.yml
+3. прописать пароль для соединения с бд
+4. импортировать дамп ./data/czthree_db_init.sql
+5. инициализировать go mod командой: go mod tidy
+6. выполнить команду: make dev
+7. запустить броузер с адресом http://localhost:3000/
+8. войти с пользователем admin и паролем: pass_to_admin

@@ -135,7 +135,7 @@ func (res resource) handlerDeletetodos(c *fiber.Ctx) error {
     if err := c.BodyParser(form); err != nil && uid != 0 {
         return c.Status(500).Redirect("/error.html?msg=Ошибка обработки формы для удаления объявления")
     }
-    if err := res.agregator.DeletetodossData(c.UserContext(), form.todosId); err != nil {
+    if err := res.agregator.DeletetodossData(c.UserContext(), form.TodoId); err != nil {
         res.logger.With(c.UserContext()).Error(err.Error())
         return c.Status(500).Redirect("/error.html?msg=Ошибка удаления объявления")
     }

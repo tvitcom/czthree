@@ -65,77 +65,6 @@ func (res resource) pageWatch(c *fiber.Ctx) error {
     })
 }
 
-func (res resource) handlerWatchAuthor(c *fiber.Ctx) error {
-    form := new(WatchAuthorForm)
-    form.SignerUA = c.Cookies("privacy_signer_ua", "")
-    form.SignerScreen = c.Cookies("privacy_signer_screen", "")
-    form.SignerLangs = c.Cookies("privacy_signer_langs", "")
-    form.SignerTime = c.Cookies("privacy_signer_time", "")
-    if err := c.BodyParser(form); err != nil {
-        res.logger.With(c.UserContext()).Error(err.Error())
-        return c.Status(412).JSON(&fiber.Map{
-            "ok": false,
-            "data": "Переданы невалидные данные",
-        })
-    }
-// println("FORM_RECAPTCHA_RESPONSE:", form.RecaptchaResponse)
-    // Validation - Stage 1 of 2
-    if form.SignerUA == "" || form.SignerScreen == "" || form.SignerLangs == "" || form.SignerTime == "" {
-        // return c.Status(403).Render("error",fiber.Map{"msg": "Пожалуйста ознакомьтесь с информацией о конфиденциальности сайта и примите решение об использовании нашего сайта!"})
-        return c.Status(403).JSON(&fiber.Map{
-            "ok": false,
-            "data": "Пожалуйста ознакомьтесь с информацией о конфиденциальности сайта и примите решение об использовании нашего сайта!",
-        })
-    }
-// println("FORM:",form.todosId, form.SignerUA, form.SignerScreen, form.SignerLangs, form.SignerTime)
-    // Validation - Stage 2 of 2
-    if err := form.Validate(); err != nil {
-        var errMsg string
-        if config.CFG.AppMode == "dev" {
-            errMsg = err.Error()
-        } else {
-            errMsg = "Невалидный запрос"
-        }
-        return c.Status(403).JSON(&fiber.Map{
-            "ok": false,
-            "data": errMsg,
-        })
-    }
-    var result bool 
-    //!!!  if config.CFG.AppMode != "dev" {
-    if false {
-        // Make google recaptcha-validation service request
-        recapcheck.Init(config.CFG.RecaptchaSecret)
-        res, err := recapcheck.Confirm(c.IP(), form.RecaptchaResponse)
-        if err != nil {
-            return c.Status(500).JSON(&fiber.Map{
-                "ok": false,
-                "data": err.Error(),
-            })
-        }
-        result = res
-    } else {
-        result = true //!!! Fake specially skip requests to Google for dev mode
-    }
-    if result {
-        author, err := res.agregator.GetUserBytodosId(c.UserContext(), form.todosId)
-        if err != nil {
-            return c.Status(500).JSON(&fiber.Map{
-                "ok": result,
-                "data": "Ошибка работы сайта",
-            })
-        }
-        return c.JSON(&fiber.Map{
-            "ok": result,
-            "data": author.Tel,
-        })
-    }
-    return c.Status(403).JSON(&fiber.Map{
-        "ok": result,
-        "data": "не доступно",
-    })
-}
-
 func (res resource) handlerActivity(c *fiber.Ctx) error {
     uid := util.Pkeyer(c.Query("uid", "0"))
     if uid == 0 {
@@ -221,7 +150,7 @@ func (res resource) handlerPublication(c *fiber.Ctx) error {
 
     // Save new Category record
     // Save new todos inactive record
-    todosId, err := res.agregator.Createtodos(c.UserContext(), form, uid, handle_dt)
+    TodoId, err := res.agregator.Createtodos(c.UserContext(), form, uid, handle_dt)
     if err != nil {
         res.logger.With(c.UserContext()).Info(err.Error())
         return c.Status(500).Render("error", fiber.Map{"msg": "Ошибка записи объявления в БД"})
@@ -240,8 +169,8 @@ func (res resource) handlerPublication(c *fiber.Ctx) error {
                 }
 
                 // Start Image convey:      
-                imagerawfname := util.Stringer(todosId) + "_" + v + "_raw.jpg"
-                imagefname := util.Stringer(todosId) + "_" + v +".jpg"
+                imagerawfname := util.Stringer(TodoId) + "_" + v + "_raw.jpg"
+                imagefname := util.Stringer(TodoId) + "_" + v +".jpg"
                 
                 if err := c.SaveFile(ff, config.PicturetodossPath + imagerawfname); err != nil {
                     return c.Status(500).Render("error", fiber.Map{
@@ -265,7 +194,7 @@ func (res resource) handlerPublication(c *fiber.Ctx) error {
                     })
                 }
                 // Update todos record with pictures names
-                err = res.agregator.UpdatetodossPicture(c.UserContext(), todosId, "picture" + v, imagefname)
+                err = res.agregator.UpdatetodossPicture(c.UserContext(), TodoId, "picture" + v, imagefname)
                 if err != nil {
                     return c.Status(500).Render("error", fiber.Map{
                         "msg": "Загруженная картинка для пользователя не сохранена.",
@@ -380,7 +309,7 @@ func (res resource) handlerMessage(c *fiber.Ctx) error {
         }
         user = findeduser
     }
-    todos, err := res.agregator.GettodosById(c.UserContext(), form.todosId)
+    todos, err := res.agregator.GettodosById(c.UserContext(), form.TodoId)
     if err != nil {
         return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта.")
     }

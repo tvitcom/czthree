@@ -138,7 +138,7 @@ svg:hover {
   {{ range .todoss }}
   <div>
     <article class="card">
-      <svg width="360" height="240" style="cursor:pointer;border:none;" onclick="window.location.href='/watch.html?todoid={{ .todosId }}#content'">
+      <svg width="360" height="240" style="cursor:pointer;border:none;" onclick="window.location.href='/watch.html?todoid={{ .TodoId }}#content'">
        <title>Нажмите для подробностей</title>
        <desc>{{ .Title }} {{ .Price }} {{ .Currency }}</desc>
        <image href="/media/{{ .Picture1 }}" height="100%" width="100%" preserveAspectRatio="xMidYMid slice" />
@@ -148,11 +148,11 @@ svg:hover {
       </filter> 
       </svg>
       <section>
-      <!-- <img src="/media/{{ .Picture1 }}" alt="{{ .Title }}" loading="lazy" decoding="async" align="left" style="cursor:pointer;border:none;width:auto;height:230px;" onclick="window.location.href='/watch.html?todoid={{ .todosId }}'"> -->
-        <h2 id="post{{ .todosId }}">{{ .Title }}...</h2>
+      <!-- <img src="/media/{{ .Picture1 }}" alt="{{ .Title }}" loading="lazy" decoding="async" align="left" style="cursor:pointer;border:none;width:auto;height:230px;" onclick="window.location.href='/watch.html?todoid={{ .TodoId }}'"> -->
+        <h2 id="post{{ .TodoId }}">{{ .Title }}...</h2>
       </section>
       <footer>
-       {{ .Price }} {{ .Currency }} <a aria-describedby="post{{ .todosId }}" href="/watch.html?todoid={{ .todosId }}">Подробности</a>
+       {{ .Price }} {{ .Currency }} <a aria-describedby="post{{ .TodoId }}" href="/watch.html?todoid={{ .TodoId }}">Подробности</a>
       </footer>
     </article>
   </div>

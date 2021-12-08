@@ -6,16 +6,12 @@ import (
 	"context"
 
 	dbx "github.com/go-ozzo/ozzo-dbx"
-	routing "github.com/go-ozzo/ozzo-routing/v2"
 )
 
 // DB represents a DB connection that can be used to run SQL queries.
 type DB struct {
 	db *dbx.DB
 }
-
-// TransactionFunc represents a function that will start a transaction and run the given function.
-type TransactionFunc func(ctx context.Context, f func(ctx context.Context) error) error
 
 type contextKey int
 
@@ -41,24 +37,4 @@ func (db *DB) With(ctx context.Context) dbx.Builder {
 		return tx
 	}
 	return db.db.WithContext(ctx)
-}
-
-// Transactional starts a transaction and calls the given function with a context storing the transaction.
-// The transaction associated with the context can be accesse via With().
-func (db *DB) Transactional(ctx context.Context, f func(ctx context.Context) error) error {
-	return db.db.TransactionalContext(ctx, nil, func(tx *dbx.Tx) error {
-		return f(context.WithValue(ctx, txKey, tx))
-	})
-}
-
-// TransactionHandler returns a middleware that starts a transaction.
-// The transaction started is kept in the context and can be accessed via With().
-func (db *DB) TransactionHandler() routing.Handler {
-	return func(c *routing.Context) error {
-		return db.db.TransactionalContext(c.Request.Context(), nil, func(tx *dbx.Tx) error {
-			ctx := context.WithValue(c.Request.Context(), txKey, tx)
-			c.Request = c.Request.WithContext(ctx)
-			return c.Next()
-		})
-	}
 }

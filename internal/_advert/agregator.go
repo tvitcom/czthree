@@ -21,7 +21,7 @@ import (
 type Agregator interface {
 	GetUsersWithLimitOffset(ctx context.Context, limit, offset int64) ([]User, error)
 	GetUserById(ctx context.Context, id int64) (User, error)
-	GetUserBytodosId(ctx context.Context, aid int64) (User, error)
+	GetUserByTodoId(ctx context.Context, aid int64) (User, error)
 	UpdateUserLastlogin(ctx context.Context, uid int64, dtstring string) error
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GettodosById(ctx context.Context, id int64) (todos, error)
@@ -45,7 +45,7 @@ type agregator struct {
 }
 
 type todos struct {
-	entity.todos
+	entity.Todo
 }
 type Category struct {
 	entity.Category
@@ -115,7 +115,7 @@ type ProfileForm struct {
 }
 // MessageForm represents an album update request.
 type MessageForm struct {
-	todosId    int64   `json:"todos-id"        form:"todos-id"`
+	TodoId    int64   `json:"todos-id"        form:"todos-id"`
 	Email       string  `json:"email"        form:"email"`
 	GivenName   string  `json:"given-name"   form:"given-name"`
 	Msg         string  `json:"msg"          form:"msg"`
@@ -130,12 +130,12 @@ type SupportForm struct {
 }
 
 type DeletetodosForm struct {
-  todosId int64  `json:"todos_id" form:"todos_id"`
+  TodoId int64  `json:"todos_id" form:"todos_id"`
 }
 
 type WatchAuthorForm struct {
   RecaptchaResponse string  `json:"g-recaptcha-response" form:"g-recaptcha-response"`
-  todosId int64  `json:"todos_id" form:"todos_id"`
+  TodoId int64  `json:"todos_id" form:"todos_id"`
   SignerUA string  `json:"signer_ua" form:"signer_ua"`
   SignerScreen string  `json:"signer_screen" form:"signer_screen"`
   SignerLangs string  `json:"signer_langs" form:"signer_langs"`
@@ -184,7 +184,7 @@ func (m QuickSearchForm) Validate() error {
 // Validate validates the WatchAuthorForm fields
 func (m WatchAuthorForm) Validate() error {
 	return vld.ValidateStruct(&m,
-		vld.Field(&m.todosId, vld.Required),
+		vld.Field(&m.TodoId, vld.Required),
 		//!!! vld.Field(&m.RecaptchaResponse, vld.When(config.CFG.AppMode != "dev", vld.Required, vld.Length(64, 512)).Else(vld.NotNil)),
 		vld.Field(&m.RecaptchaResponse, vld.When(false, vld.Required, vld.Length(64, 512)).Else(vld.NotNil)),
 		vld.Field(&m.SignerUA, vld.Required, vld.Length(30,512), vld.Match(regexp.MustCompile(`[0-9a-zA-Z-\/;\(\)\.,]{30,512}`))),
@@ -300,11 +300,11 @@ func (ag agregator) GetUserById(ctx context.Context, id int64) (User, error) {
 	return User{user}, nil
 }
 
-func (ag agregator) GetUserBytodosId(ctx context.Context, aid int64) (User, error) {
+func (ag agregator) GetUserByTodoId(ctx context.Context, aid int64) (User, error) {
 	if aid == 0 {
 		return User{}, nil
 	}
-	user, err := ag.repo.GetUserBytodosId(ctx, aid)
+	user, err := ag.repo.GetUserByTodoId(ctx, aid)
 	if err != nil {
 		return User{}, err
 	}

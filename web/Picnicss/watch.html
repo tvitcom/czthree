@@ -5,11 +5,11 @@
 <link rel= "dns-prefetch" href="https://www.googletagmanager.com/">
 <link rel="preload" href="/assets/style/style.css" as="style">
 <link rel="preload" href="/assets/style/v6.0.0-beta3.css" as="style">
-<title>czthree - {{ .todos.Title }} (№{{ .todos.todosId }})</title>
+<title>czthree - {{ .todos.Title }} (№{{ .todos.TodoId }})</title>
 <meta charset="utf-8"><meta name="theme-color" content="#317EFB"/>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="keywords" content="Тодо,сайт,объявление,содержание,написать,подаловаться,автор,GDPR,уведомление,политика,персональных,данных,конфиденциальность,куки,cookie,разрешение">
-<meta name="description" content="на Тодо сайте размещено объявление (№{{ .todos.todosId }}): {{ .todos.Title }}">
+<meta name="description" content="на Тодо сайте размещено объявление (№{{ .todos.TodoId }}): {{ .todos.Title }}">
 <link rel="stylesheet" href="/assets/style/style.css">
 <link rel="stylesheet" href="/assets/style/v6.0.0-beta3.css">
 <link rel="font" href="/assets/webfonts/fa-brands-400.woff2">
@@ -58,7 +58,7 @@
         "interactionStatistic": {
             "@type": "InteractionCounter",
             "interactionType": "https://schema.org/WatchAction",
-            "userInteractionCount": "{{ .todos.todosId }}"
+            "userInteractionCount": "{{ .todos.TodoId }}"
         }
     }
 </script>
@@ -79,7 +79,7 @@
 <div class="content">
     <header>
       <h1>{{ .todos.Title }}</h1>
-      <p>Цена: {{ .todos.Price }} грн&nbsp;&nbsp;&nbsp;<small>(Объявление №{{ .todos.todosId }})</small></p>
+      <p>Цена: {{ .todos.Price }} грн&nbsp;&nbsp;&nbsp;<small>(Объявление №{{ .todos.TodoId }})</small></p>
     </header>
     <p>{{ .todos.Nanopost }}</p>
     <address>
@@ -93,7 +93,7 @@
     {{ if ne .uid 1 }}
     <p>
       <form id="watchauthor" enctype="application/x-www-form-urlencoded" action="/watchauthor.html" method="POST">
-        <input type="hidden" name="todos_id" value="{{ .todos.todosId }}">
+        <input type="hidden" name="todos_id" value="{{ .todos.TodoId }}">
         <!-- VERSION FOR LOCAL DEBUG  -->
         <input id="submitwatchauthor" form="watchauthor" type="submit" title="Пройдите reCAPTCH проверку что вы не бот" class="button warning" value="Показать" onclick="onSubmit();">
         
@@ -101,13 +101,13 @@
         
         <!-- <button class="g- r eca ptcha" data-sitekey="{{ .recaptcha_site_key }} title="Пройзойдет reCAPTCH проверка что вы не бот" data-callback='onSubmit'>Submit</button> -->
 
-        <!-- <a href="/message.html?todoid={{ .todos.todosId }}#form" title="Написать сообщение автору - {{ .user.Name }}" class="button">Написать</a> -->
-        <a href="/support.html?todoid={{ .todos.todosId }}#form" title="Форма для написания жалобы в техподдержку" class="pseudo button">Пожаловаться</a>
+        <!-- <a href="/message.html?todoid={{ .todos.TodoId }}#form" title="Написать сообщение автору - {{ .user.Name }}" class="button">Написать</a> -->
+        <a href="/support.html?todoid={{ .todos.TodoId }}#form" title="Форма для написания жалобы в техподдержку" class="pseudo button">Пожаловаться</a>
       </form><!-- form#watchauthor -->
     </p>
     {{ else if eq .user.UserId .todos.UserId }}
     <form id="deltodos" method="post" action="/my/deletetodos.html" target="_self">
-      <input type="hidden" name="todos_id" value="{{ .todos.todosId }}">
+      <input type="hidden" name="todos_id" value="{{ .todos.TodoId }}">
       <input type="submit" value="Полностью удалить">
     </form>
     {{ else }}
@@ -115,10 +115,10 @@
     <footer>
       <div>
         <h2><small>Делитесь с друзьями в мессенджерах</small></h2>
-        <a class="pseudo button" title="Отправить через Telegram" target="_blank" href="tg://share/url?url=https://{{ .fqdn }}/watch.html?todoid={{.todos.todosId }}#content&text={{ .todos.Title }}_{{.todos.todosId }}"><i class="fa-brands fa-telegram"></i> Telegram</a>
-        <a class="pseudo button" title="Отправить через Viber" target="_blank" href="viber://forward?text={{ .todos.Title }}_{{.todos.todosId }}"><i class="fa-brands fa-viber"></i> Viber</a>
-        <a class="pseudo button" title="Отправить через WhatsApp" target="_blank" href="whatsapp://send?text=https://{{ .fqdn }}/watch.html?todoid={{.todos.todosId }}#{{ .todos.Title }}_{{.todos.todosId }}"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
-        <a class="pseudo button" title="Отправить через Instagram" target="_blank" href="instagram://tag?name=https://{{ .fqdn }}/watch.html?todoid={{ .todos.todosId }}#content&text={{ .todos.Title }}_{{.todos.todosId }}"><i class="fa-brands fa-instagram"></i> Instagram</a>
+        <a class="pseudo button" title="Отправить через Telegram" target="_blank" href="tg://share/url?url=https://{{ .fqdn }}/watch.html?todoid={{.todos.TodoId }}#content&text={{ .todos.Title }}_{{.todos.TodoId }}"><i class="fa-brands fa-telegram"></i> Telegram</a>
+        <a class="pseudo button" title="Отправить через Viber" target="_blank" href="viber://forward?text={{ .todos.Title }}_{{.todos.TodoId }}"><i class="fa-brands fa-viber"></i> Viber</a>
+        <a class="pseudo button" title="Отправить через WhatsApp" target="_blank" href="whatsapp://send?text=https://{{ .fqdn }}/watch.html?todoid={{.todos.TodoId }}#{{ .todos.Title }}_{{.todos.TodoId }}"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+        <a class="pseudo button" title="Отправить через Instagram" target="_blank" href="instagram://tag?name=https://{{ .fqdn }}/watch.html?todoid={{ .todos.TodoId }}#content&text={{ .todos.Title }}_{{.todos.TodoId }}"><i class="fa-brands fa-instagram"></i> Instagram</a>
       </div>
     </footer>
 </div>

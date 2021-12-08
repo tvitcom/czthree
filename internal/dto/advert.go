@@ -6,7 +6,7 @@ import (
 
 // todos represents an album record.
 type todosDisplay struct {
-  todosId      int64  `db:"pk,todos_id"`
+  TodoId      int64  `db:"pk,todos_id"`
   CategoryName  string  `db:"category_name"`
   Title         string  `db:"title"`
   Price         int     `db:"price"`

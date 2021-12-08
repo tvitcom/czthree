@@ -32,7 +32,7 @@ type Repository interface {
 	// Get returns the user with the specified user_id.
 	GetUserById(ctx context.Context, id int64) (entity.User, error)
 	// Get returns the user with the specified todos_id.
-	GetUserBytodosId(ctx context.Context, aid int64) (entity.User, error)
+	GetUserByTodoId(ctx context.Context, aid int64) (entity.User, error)
 	// Get returns the todos with the specified email.
 	GetUserByEmail(ctx context.Context, email string) (entity.User, error)
 	// Count returns the number of todoss.
@@ -83,7 +83,7 @@ func (r repository) GetUserById(ctx context.Context, id int64) (entity.User, err
 }
 
 // Get the user with the specified todos_ID from the database.
-func (r repository) GetUserBytodosId(ctx context.Context, aid int64) (entity.User, error) {
+func (r repository) GetUserByTodoId(ctx context.Context, aid int64) (entity.User, error) {
 	var user entity.User
 	sql := `select u.* from user u left join todos a on u.user_id=a.user_id where a.todos_id={:aid}`
 	err := r.db.With(ctx).NewQuery(sql).Bind(dbx.Params{"aid": aid}).One(&user)
@@ -114,7 +114,7 @@ func (r repository) Createtodos(ctx context.Context, todos entity.todos) (int64,
 	if err != nil {
 		return 0, err
 	}
-	return todos.todosId, nil
+	return todos.TodoId, nil
 }
 
 // return todos records in the database.

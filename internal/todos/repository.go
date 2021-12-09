@@ -40,7 +40,9 @@ type Repository interface {
 	// Create saves a new user in the storage.
 	CreateUser(ctx context.Context, user entity.User) (int64, error)
 	// Update user in the storage.
-	UpdateTodo(ctx context.Context, td entity.Todo, uid int64) error
+	// UpdateTodo(ctx context.Context, td entity.Todo, uid int64) error
+	// Update user in the storage.
+	UpdateTodoStatus(ctx context.Context, td entity.Todo) error
 	// Update user in the storage.
 	UpdateUser(ctx context.Context, user entity.User, uid int64) error
 	// Create saves a new Todo in the storage.
@@ -130,17 +132,38 @@ func (r repository) GetUsersWithLimitOffset(ctx context.Context, limit, offset i
 }
 
 // Update saves the changes to an user in the database.
-func (r repository) UpdateTodo(ctx context.Context, td entity.Todo, uid int64) error {
+func (r repository) UpdateTodoStatus(ctx context.Context, td entity.Todo) error {
 	dbxvar := dbx.Params{
-			"status": 2,
+			"status": td.Status,
 		}
 	// UPDATE `users` SET `status`={:p0} WHERE `id`={:p1}
 	_, err := r.db.With(ctx).Update("todo", dbxvar, dbx.HashExp{
-		"perfomer_id": uid,
 		"todo_id": td.TodoId,
 	}).Execute()
 	return err
 }
+
+// Update saves the changes to an user in the database.
+// func (r repository) UpdateTodo(ctx context.Context, td entity.Todo, uid int64) error {
+// 	dbxvar := dbx.Params{
+// 			"status": td.Status,
+// 		}
+// 	if td.Name != "" {
+// 		dbxvar["name"] = td.Name
+// 	}
+// 	if td.PerfomerId != 0 {
+// 		dbxvar["perfomer_id"] = td.PerfomerId
+// 	}
+// 	if td.PerfomerId != 0 {
+// 		dbxvar["creator_id"] = td.PerfomerId
+// 	}
+// 	// UPDATE `users` SET `status`={:p0} WHERE `id`={:p1}
+// 	_, err := r.db.With(ctx).Update("todo", dbxvar, dbx.HashExp{
+// 		"todo_id": td.TodoId,
+// 	}).Execute()
+// 	return err
+// }
+
 
 // Update saves the changes to an user in the database.
 func (r repository) UpdateUser(ctx context.Context, user entity.User, uid int64) error {

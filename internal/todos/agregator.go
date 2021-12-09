@@ -23,7 +23,8 @@ type Agregator interface {
 	GetTodoById(ctx context.Context, id int64) (Todo, error)
 	GetTodoDisplayByUserId(ctx context.Context, uid int64) ([]TodoDisplay, error)
 	GetTodoByUserId(ctx context.Context, uid int64) ([]Todo, error)
-	UpdateTodo(ctx context.Context, fdata *UpdateTodoForm, uid int64) error
+	UpdateTodoStatus(ctx context.Context, fdata *UpdateTodoStatusForm, uid int64) error
+	// UpdateTodo(ctx context.Context, fdata *TodoForm, uid int64) error
 	DeleteTodoData(ctx context.Context, aid int64) error
 	UpdateUser(ctx context.Context, fdata *ProfileForm,uid int64, avafile string) error
 	CreateTodo(ctx context.Context, f *TodoForm, uid, perfid int64, dt string) (int64, error)
@@ -67,9 +68,9 @@ type LoginForm struct {
 	CurrentPassword   string  `json:"current-password" form:"current-password"`
 }
 // pdateTodoForm represents an album update request.
-type UpdateTodoForm struct {
-	TodoId   int64  `json:"todoid" form:"todoit"`
-	Status   int    `json:"status" form:"status"`
+type UpdateTodoStatusForm struct {
+	TodoId       int64   `json:"todoid" form:"todoit"`
+	Status       int     `json:"status" form:"status"`
 }
 // ProfileForm represents an album update request.
 type ProfileForm struct {
@@ -92,7 +93,7 @@ func (m LoginForm) Validate() error {
 }
 
 // Validate validates the LoginForm fields
-func (f UpdateTodoForm) Validate() error {
+func (f UpdateTodoStatusForm) Validate() error {
 	return vld.ValidateStruct(&f,
 		vld.Field(&f.TodoId, vld.Required),
 		vld.Field(&f.Status, vld.Required),
@@ -124,16 +125,42 @@ func NewAgregator(repo Repository, logger log.Logger) agregator {
 	return agregator{repo, logger}
 }
 
-// Update user.
-func (ag agregator) UpdateTodo(ctx context.Context, tdf *UpdateTodoForm, uid int64) error {
-	return ag.repo.UpdateTodo(ctx, 
+// Update sattus in todo.
+func (ag agregator) UpdateTodoStatus(ctx context.Context, tdf *UpdateTodoStatusForm, uid int64) error {
+	var newstatus int
+	if uid != config.AdminUserID && tdf.Status == config.TODO_DONE { // status == 2
+		newstatus = config.TODO_DONE
+	} else if uid == config.AdminUserID {
+		newstatus = tdf.Status
+	} else {
+		return errors.New("Bad user credential for operation")
+	}
+	return ag.repo.UpdateTodoStatus(ctx, 
 		entity.Todo{
 	    TodoId: tdf.TodoId,
-	    Status: tdf.Status,
-		}, 
-		uid,
+	    Status: newstatus,
+		},
 	)
 }
+
+// Update sattus in todo.
+// func (ag agregator) UpdateTodo(ctx context.Context, tdf *TodoForm, uid int64) error {
+// 	var newstatus int
+// 	if uid != config.AdminUserID && tdf.Status == config.TODO_DONE { // status == 2
+// 		newstatus = config.TODO_DONE
+// 	} else if uid == config.AdminUserID {
+// 		newstatus = tdf.Status
+// 	} else {
+// 		return errors.New("Bad user credential for operation")
+// 	}
+// 	return ag.repo.UpdateTodo(ctx, 
+// 		entity.Todo{
+// 	    TodoId: tdf.TodoId,
+// 	    Status: tdf.Status,
+// 		}, 
+// 		uid,
+// 	)
+// }
 
 // Update user.
 func (ag agregator) UpdateUser(ctx context.Context, pf *ProfileForm, uid int64, avafile string) error {

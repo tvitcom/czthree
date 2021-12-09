@@ -5,7 +5,7 @@ import (
     // "time"
     // "errors"
     "github.com/gofiber/fiber/v2"
-    // "github.com/tvitcom/czthree/internal/config"
+    "github.com/tvitcom/czthree/internal/config"
     "github.com/tvitcom/czthree/pkg/util"  
     
 )
@@ -131,7 +131,10 @@ func (res resource) pageUserTodo(c *fiber.Ctx) error {
 }
 
 func (res resource) handlerDeleteTodo(c *fiber.Ctx) error {
-    // uid := util.Pkeyer(c.Locals("iam"))
+    uid := util.Pkeyer(c.Locals("iam"))
+    if uid != config.AdminUserID { // Non admin with id=1 go ahead
+        return c.Status(403).Render("error", fiber.Map{"msg": "Unauthorised"})
+    }
     // form := new(DeleteTodoForm)
     // if err := c.BodyParser(form); err != nil && uid != 0 {
     //     return c.Status(500).Redirect("/error.html?msg=Ошибка обработки формы для удаления объявления")
@@ -147,17 +150,19 @@ func (res resource) handlerDeleteTodo(c *fiber.Ctx) error {
 
 func (res resource) handlerUpdateTodo(c *fiber.Ctx) error {
     uid := util.Pkeyer(c.Locals("iam"))
-    form := new(UpdateTodoForm)
+    form := new(UpdateTodoStatusForm)
     form.TodoId = util.Pkeyer(c.Query("todoid", "0"))
+fmt.Printf("TODOID: %v", c.Query("todoid", "0"))
+fmt.Printf("PREFORM: %v", form)
     if err := c.BodyParser(form); err != nil && uid != 0 {
         return c.Status(500).Redirect("/error.html?msg=Ошибка обработки формы для смены статуса todo")
     }
     // Form validation
-    fmt.Printf("FORM: %v", form)
+fmt.Printf("FORM: %v", form)
     if err := form.Validate(); err != nil {
         return c.Status(412).Render("error", fiber.Map{"msg": err})
     }
-    if err := res.agregator.UpdateTodo(c.UserContext(), form, uid); err != nil {
+    if err := res.agregator.UpdateTodoStatus(c.UserContext(), form, uid); err != nil {
         res.logger.With(c.UserContext()).Error(err.Error())
         return c.Status(500).Redirect("/error.html?msg=Ошибка удаления объявления")
     }
@@ -166,7 +171,7 @@ func (res resource) handlerUpdateTodo(c *fiber.Ctx) error {
 
 func (res resource) pageUserList(c *fiber.Ctx) error {
     uid := util.Pkeyer(c.Locals("iam"))
-    if uid > 1 { // Non admin with id=1 go ahead
+    if uid != config.AdminUserID { // Non admin with id=1 go ahead
         return c.Status(403).Render("error", fiber.Map{"msg": "Unauthorised"})
     }
     curruser, err := res.agregator.GetUserById(c.UserContext(), uid)

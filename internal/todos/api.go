@@ -39,7 +39,7 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
     
     MWauthentication := func(c *fiber.Ctx) error {
         c.Append("Restricted-by", "jwt")
-        tryjwt := c.Cookies("tok","~")
+        tryjwt := c.Cookies("tok","")
         // Cookie empty
         if tryjwt == "" {
             return c.Status(403).Redirect("/error.html?msg=Используйте страницу входа")
@@ -153,7 +153,7 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
     authGroup.Post("/logout.html", res.handlerLogout)
 
 // REGISTERED USERS ONLY:
-//Создание/Просмотр/Изменение/Удаление TODO.
+//Создание C/Просмотр R/Изменение U/Удаление D   for TODO.
     myGroup := router.Group("/my", MWauthentication, MWheader, MWcsp)
 
 /* ----------- Todo: --------------*/

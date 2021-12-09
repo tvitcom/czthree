@@ -1,4 +1,4 @@
-package todos
+package Todo
 
 import (
     "fmt"
@@ -64,7 +64,7 @@ func (res resource) handlerLogin(c *fiber.Ctx) error {
         return c.Status(403).Render("error", fiber.Map{"msg": err})
     }
     makeJWTCookie(c, tok)
-    return c.Redirect("/my/usertodoss.html", 301)
+    return c.Redirect("/my/userTodo.html", 301)
 }
 func (res resource) handlerLogout(c *fiber.Ctx) error {
     deleteJWTCookie(c)

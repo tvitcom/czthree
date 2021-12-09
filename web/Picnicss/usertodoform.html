@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<title>czthree - Объявления пользователя {{ .user.Name }}</title>
+<title>czthree - Профиль пользователя {{ .user.Name }}</title>
 <meta charset="utf-8"><meta name="theme-color" content="#317EFB"/>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="keywords" content="объявления, разместить, бесплатно, Харьков, Украина, купить, рубрика, категория, аренда, авто, велосипед, спорт, услуги, мастера, компьютер, мебель, ремонт">
 <meta name="description" content="Тодо сайт частных объявлений города Харьков">
-<link rel="preload" href="/assets/style/style.css" as="style">
 <link rel="stylesheet" href="/assets/style/style.css">
 <link rel="icon" href="/assets/img/basket.png" type="image/png">
 <link rel="stylesheet" media="screen" href="/assets/style/prism.css">
@@ -111,7 +110,7 @@ aside .links a.button {
         <h2>Разделы</h2>
         <div class="links flex two three-500 five-800 one-1000">
           <div>
-            <a class="pseudo button" href="/my/usertodoss.html"><b>Объявления</b></a>
+            <a class="pseudo button" href="/my/userTodo.html">Объявления</a>
           </div>
           <div>
             <a class="pseudo button" href="/my/usermessages.html">Сообщения</a>
@@ -122,55 +121,46 @@ aside .links a.button {
           </div>
           {{end}}
           <div>
-            <a class="pseudo button" href="/my/userprofile.html">Профиль</a>
+            <a class="pseudo button" href="/my/userprofile.html"><b>Профиль</b></a>
           </div>
         </div>
         <a href="#home" tabindex="-1" class="top pseudo button visible">▲ Наверх ▲</a>
       </aside>
       <article class="full four-fifth-1000">
-        
 
-<h2 id="tabs">Объявления</h2>
-<table class="primary">
-  <thead>
-    <tr>
-      <th>заголовок</th>
-      <th>дата</th>
-      <th>категория</th>
-      <th>модерация</th>
-      <th>активно</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{ range .todossdisplay }}
-    <tr>
-      <td><a href="/watch.html?todoid={{ .TodoId }}" title="Открыть" target="_self">{{ .Title }}</a></td>
-      <td>{{ .Created }}</td>
-      <td>{{ .CategoryName }}</td>
-      <td>{{ .ModeratorId }}</td>
-      <td>{{ .Active }}</td>
-    </tr>
-    {{ end }}
-    <!-- <tr>
-      <td>Eve</td>
-      <td>23 июля</td>
-      <td>San Francisco, USA</td>
-      <td>22</td>
-    </tr>
-    <tr>
-      <td>Martin</td>
-      <td>Martin</td>
-      <td>New York, USA</td>
-      <td>45</td>
-    </tr>
-    <tr>
-      <td>Sarah</td>
-      <td>Sarah</td>
-      <td>London, UK</td>
-      <td>25</td>
-    </tr> -->
-  </tbody>
-</table>
+<div class="visual">
+<h3 id="positions">Профиль {{ .msg }}</h3>
+<style>
+  .miniprofile {
+  border-radius: 50%;    /* Make it a circle */
+  margin: 0 auto;        /* Center horizontally */
+  width: 60%;            /* 60% width */
+  padding-bottom: 60%;   /* 60% height */
+}
+</style>
+<form id="userprofile" method="post" enctype="multipart/form-data" action="/my/userprofile.html" target="_self">
+<div style="width: 200px;margin:40px;">
+  <label class="dropimage miniprofile" style="background-image: url(/userpic/{{ .user.UserId }}/{{ .user.Picture }})">
+    <input name="picture" title="Клик для выбора фото для загрузки (.jpeg)" type="file" accept="image/jpeg">
+  </label>
+</div>
+<fieldset class="flex three-600 one-400">
+  <label><input type="name" placeholder="Имя" name="given-name" value="{{ .user.Name }}" autofocus="autofocus" minlength="2" maxlength="64" pattern="[a-zA-Zа-яёА-ЯЁїЇіІґҐ\s\.\,\-\']{2,64}" required="required"></label>
+  <label><input type="tel" name="tel" value="{{.user.Tel}}" placeholder="Телефон" pattern="[\d\s\-\+\(\)]{10,21}" autocomplete="tel"></label>
+  <label><input form="anotherdummyform" type="email" name="email" value="{{.user.Email}}" placeholder="E-mail" disabled></label>
+</fieldset>
+<fieldset class="flex two-600 one-400">
+  <label>
+    <input type="password" name="new-password" title="Придумайте пароль более 6 символов вида Zb&q9?va (к примеру Междунамитаетлёд в английской раскладке)" placeholder="Введите пароль если меняете его*" maxlength="128" minlength="6">
+  </label>
+  <label>
+    <input type="password" name="new-password-repeat" title="Введите еще раз - докажите что запомнили" placeholder="Повторите пароль*" maxlength="128" minlength="6">
+  </label>
+</fieldset>
+<button class='success' type="submit">Обновить</button>
+<a class='button warning' href="/my/userTodo.html" target="_self" title="не сохранившись перейти мои объявления">Закрыть</a>
+</form>
+</div>
 
 </article>
 </section>

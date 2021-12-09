@@ -1,4 +1,4 @@
-package todos
+package Todo
 
 import (
     "time"
@@ -68,7 +68,7 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
     MWnouser := func(c *fiber.Ctx) error {
         mwuid := c.Locals("iam")
         if mwuid != nil {
-            return c.Redirect("/my/usertodoss.html", 301)
+            return c.Redirect("/my/userTodo.html", 301)
         }
         return c.Next()
     }
@@ -187,16 +187,16 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
 
 // REGISTERED USERS ONLY:
     myGroup := router.Group("/my", MWauthentication, MWheader, MWcsp)
-// POST /my/deltodos.html
-    myGroup.Post("/deletetodos.html", res.handlerDeletetodos)
+// POST /my/delTodo.html
+    myGroup.Post("/deleteTodo.html", res.handlerDeleteTodo)
 // GET  /my/userprofile.html
     myGroup.Get("/userprofile.html", res.pageUserProfile)
 // POST /my/userprofile.html
     myGroup.Post("/userprofile.html", res.handlerUserProfile)
-// GET  /my/todoss.html?advid=123
-    myGroup.Get("/usertodoss.html", res.pageUsertodoss)
-// POST /my/usertodoss.html
-    myGroup.Post("/usertodoss.html", res.pageSoon)
+// GET  /my/Todo.html?advid=123
+    myGroup.Get("/userTodo.html", res.pageUserTodo)
+// POST /my/userTodo.html
+    myGroup.Post("/userTodo.html", res.pageSoon)
 // GET  /my/usermessages.html?uid=123
     myGroup.Get("/usermessages.html", res.pageUserMessages)
 // POST /my/usermessages.html

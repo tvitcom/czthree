@@ -4,9 +4,9 @@ import (
 	// "time"
 )
 
-// todos represents an album record.
+// Todo represents an album record.
 type Todo struct {
-  TodoId    int64  `db:"pk,todos_id"`
+  TodoId    int64  `db:"pk,Todo_id"`
   AuthorId      int64  `db:"user_id"`
   PerfomerId  int64  `db:"category_id"`
   Name       string  `db:"title"`

@@ -1,4 +1,4 @@
-package todos
+package Todo
 
 import (
     "strings"
@@ -12,7 +12,7 @@ import (
 )
 
 func (res resource) pageIndex(c *fiber.Ctx) error {
-    var todoss []todos
+    var Todo []Todo
     searchclause := strings.TrimSpace(c.Query("q", ""))
     if searchclause != "" {
         form := new(QuickSearchForm) 
@@ -21,21 +21,21 @@ func (res resource) pageIndex(c *fiber.Ctx) error {
         if err := form.Validate(); err != nil {
             return c.Status(412).Render("error", fiber.Map{"msg": err})
         }
-        res, err := res.agregator.GettodossSearch(c.UserContext(), form.Clause)
+        res, err := res.agregator.GetTodoSearch(c.UserContext(), form.Clause)
         if err != nil {
             return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта")
         }
-        todoss = res
+        Todo = res
     } else {
-        res, err := res.agregator.GettodossLast(c.UserContext())
+        res, err := res.agregator.GetTodoLast(c.UserContext())
         if err != nil {
             return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта")
         }
-        todoss = res
+        Todo = res
     }
     return c.Render("index", fiber.Map{
         "msg": "index page",
-        "todoss": todoss,
+        "Todo": Todo,
     })
 }
 
@@ -46,19 +46,19 @@ func (res resource) pageWatch(c *fiber.Ctx) error {
         res.logger.With(c.UserContext()).Error("Ошибка GET advid параметра")
         return c.Status(500).Redirect("/error.html?msg=Ошибка параметра запроса.")
     }
-    todos, err := res.agregator.GettodosById(c.UserContext(), advid)
+    Todo, err := res.agregator.GetTodoById(c.UserContext(), advid)
     if err != nil {
     println(err.Error())
         return c.Status(404).Redirect("/error.html?msg=Объявление не найдено или удалено.")
     }
-    author, err := res.agregator.GetUserById(c.UserContext(), todos.UserId)
+    author, err := res.agregator.GetUserById(c.UserContext(), Todo.UserId)
     if err != nil {
         return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта.")
     }
     return c.Render("watch", fiber.Map{
         "msg": "watch page",
         "recaptcha_site_key": config.CFG.RecaptchaSiteKey,
-        "todos": todos,
+        "Todo": Todo,
         "user": author,
         "fqdn": config.CFG.AppFqdn,
         "uid": uid,
@@ -142,7 +142,7 @@ func (res resource) handlerActivity(c *fiber.Ctx) error {
         res.logger.With(c.UserContext()).Error("Ошибка GET advid параметра")
         return c.Status(500).Redirect("/error.html?msg=Ошибка параметра")
     }
-    todoss, err := res.agregator.GettodossByUserId(c.UserContext(), uid)
+    Todo, err := res.agregator.GetTodoByUserId(c.UserContext(), uid)
     if err != nil {
         return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта")
     }
@@ -152,7 +152,7 @@ func (res resource) handlerActivity(c *fiber.Ctx) error {
     }
     return c.Render("activity", fiber.Map{
         "msg": "activity page",
-        "todoss": todoss,
+        "Todo": Todo,
         "author": author,
     })
 }
@@ -174,13 +174,13 @@ func (res resource) pagePublication(c *fiber.Ctx) error {
     })
 }
 
-// ->makeUser->maketodosInactive->sendApproveUser1 [->handleEmailApprove]->userprofile->usertodoss
+// ->makeUser->makeTodoInactive->sendApproveUser1 [->handleEmailApprove]->userprofile->userTodo
 func (res resource) handlerPublication(c *fiber.Ctx) error {
-    // format in the assets/media/[todos_id]_[num].jpg pictures format
+    // format in the assets/media/[Todo_id]_[num].jpg pictures format
     handle_dt := time.Now().Format("2006-01-02 15:04:05") // Datetime for seve resources by bigint(datetime)
     uid := util.Pkeyer(c.Locals("iam"))
     logined := uid
-    form := new(QuicktodosForm) 
+    form := new(QuickTodoForm) 
     if err := c.BodyParser(form); err != nil {
         res.logger.With(c.UserContext()).Error(err.Error())
         return c.Status(412).Render("error", fiber.Map{"msg": err})
@@ -220,8 +220,8 @@ func (res resource) handlerPublication(c *fiber.Ctx) error {
     }
 
     // Save new Category record
-    // Save new todos inactive record
-    TodoId, err := res.agregator.Createtodos(c.UserContext(), form, uid, handle_dt)
+    // Save new Todo inactive record
+    TodoId, err := res.agregator.CreateTodo(c.UserContext(), form, uid, handle_dt)
     if err != nil {
         res.logger.With(c.UserContext()).Info(err.Error())
         return c.Status(500).Render("error", fiber.Map{"msg": "Ошибка записи объявления в БД"})
@@ -243,29 +243,29 @@ func (res resource) handlerPublication(c *fiber.Ctx) error {
                 imagerawfname := util.Stringer(TodoId) + "_" + v + "_raw.jpg"
                 imagefname := util.Stringer(TodoId) + "_" + v +".jpg"
                 
-                if err := c.SaveFile(ff, config.PicturetodossPath + imagerawfname); err != nil {
+                if err := c.SaveFile(ff, config.PictureTodoPath + imagerawfname); err != nil {
                     return c.Status(500).Render("error", fiber.Map{
                         "msg": err,
                     })
                 }
-                if err := util.ImagefileValidations(config.PicturetodossPath + imagerawfname); err != nil {
+                if err := util.ImagefileValidations(config.PictureTodoPath + imagerawfname); err != nil {
                     return c.Status(501).Render("error", fiber.Map{
                         "msg": "Загруженная картинка не подходит для сайта",
                     })
                 }
-                if err := util.ImagefileResizing(config.PicturetodossPath + imagerawfname, config.PicturetodossPath + imagefname, 468); err != nil {
+                if err := util.ImagefileResizing(config.PictureTodoPath + imagerawfname, config.PictureTodoPath + imagefname, 468); err != nil {
                     return c.Status(500).Render("error", fiber.Map{
                         "msg": "Загруженная картинка не подходит для обработки.",
                     })
                 }
-                err = util.ImagefileProgressiveOptimisation(c.UserContext(), config.PicturetodossPath + imagefname, "", true)
+                err = util.ImagefileProgressiveOptimisation(c.UserContext(), config.PictureTodoPath + imagefname, "", true)
                 if err != nil {
                     return c.Status(500).Render("error", fiber.Map{
                         "msg": "Загруженная картинка не обработана.",
                     })
                 }
-                // Update todos record with pictures names
-                err = res.agregator.UpdatetodossPicture(c.UserContext(), TodoId, "picture" + v, imagefname)
+                // Update Todo record with pictures names
+                err = res.agregator.UpdateTodoPicture(c.UserContext(), TodoId, "picture" + v, imagefname)
                 if err != nil {
                     return c.Status(500).Render("error", fiber.Map{
                         "msg": "Загруженная картинка для пользователя не сохранена.",
@@ -323,17 +323,17 @@ func (res resource) pageMessage(c *fiber.Ctx) error {
         return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта.")
     }
     aid := util.Pkeyer(c.Query("advid", "0"))
-    todos, err := res.agregator.GettodosById(c.UserContext(), aid)
+    Todo, err := res.agregator.GetTodoById(c.UserContext(), aid)
     if err != nil {
         return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта.")
     }
-    todossuser, err := res.agregator.GetUserById(c.UserContext(), todos.UserId)
+    Todouser, err := res.agregator.GetUserById(c.UserContext(), Todo.UserId)
     if err != nil {
         return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта.")
     }
     return c.Render("message", fiber.Map{
         "msg": "Сообщение пользователю",
-        "todossuser": todossuser,
+        "Todouser": Todouser,
         "user": user,
         "aid": aid,
     })
@@ -380,11 +380,11 @@ func (res resource) handlerMessage(c *fiber.Ctx) error {
         }
         user = findeduser
     }
-    todos, err := res.agregator.GettodosById(c.UserContext(), form.TodoId)
+    Todo, err := res.agregator.GetTodoById(c.UserContext(), form.TodoId)
     if err != nil {
         return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта.")
     }
-    if err := res.agregator.CreateMessage(c.UserContext(), user.UserId, todos.UserId, form.Msg, handle_dt); err != nil {
+    if err := res.agregator.CreateMessage(c.UserContext(), user.UserId, Todo.UserId, form.Msg, handle_dt); err != nil {
         return c.Status(500).Render("error", fiber.Map{"msg": "Ошибка создания сообщения."})
     }
     return c.Status(201).Render("thanks", fiber.Map{

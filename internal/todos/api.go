@@ -1,10 +1,9 @@
-package todos
+package Todo
 
 import (
-    "time"
+    // "time"
 	"github.com/gofiber/fiber/v2"
-    "github.com/gofiber/fiber/v2/middleware/limiter"
-    "github.com/gofiber/fiber/v2/middleware/monitor"
+    // "github.com/gofiber/fiber/v2/middleware/limiter"
     "github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/tvitcom/czthree/pkg/log"
     "github.com/tvitcom/czthree/pkg/util"
@@ -22,6 +21,7 @@ type (
 // RegisterHandlers sets up the routing of the HTTP handlers.
 func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger) {
 	res := resource{agregator, logger}
+    /*
     MWheader := func(c *fiber.Ctx) error {
         c.Append("Powered-by", config.CFG.WebservName)
         
@@ -53,6 +53,7 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
         _ = c.Locals("iam", fastjson.GetString(tokdata, "sub"))
         return c.Next()
     }
+    */
     MWuserinfo := func(c *fiber.Ctx) error {
         tryjwt := c.Cookies("tok","")
         // Cookie empty
@@ -65,13 +66,15 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
         }
         return c.Next()
     }
+    /*
     MWnouser := func(c *fiber.Ctx) error {
         mwuid := c.Locals("iam")
         if mwuid != nil {
-            return c.Redirect("/my/usertodoss.html", 301)
+            return c.Redirect("/my/userTodo.html", 301)
         }
         return c.Next()
     }
+    */
     MWcsp := func(c *fiber.Ctx) error {
             // require-trusted-types-for 'script';
         csp := `
@@ -107,6 +110,7 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
         c.Append("X-Frame-Options", "SAMEORIGIN")
         return c.Next()
     }
+    /*
     MWRateLim := limiter.New(limiter.Config{
         Next: func(c *fiber.Ctx) bool {
             return c.IP() == "127.0.0.1"
@@ -123,7 +127,8 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
             })
         },
     })
-	
+	*/
+    
 // GET  /index.html?loc=Kharkovskaya&cat=123&q=qwerty
     // router.Use(MWRateLim)
     router.Use(compress.New(compress.Config{
@@ -132,40 +137,43 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
     
 	router.Get("/", MWuserinfo, MWcsp, res.pageIndex)
 // RATELIMITED PAGES:
-    authGroup := router.Group("/auth", MWRateLim, MWuserinfo, MWcsp)
+    // authGroup := router.Group("/auth", MWRateLim, MWuserinfo, MWcsp)
+
 // GET  /auth/login.html?uid=1234&aprove=mail&otcode=123qwerty5467
-	authGroup.Get("/login.html", MWnouser, res.pageLogin)
+	// authGroup.Get("/login.html", MWnouser, res.pageLogin)
+
 // POST /auth/login.html?aprove=mail
-	authGroup.Post("/login.html", MWnouser, res.handlerLogin)
+	// authGroup.Post("/login.html", MWnouser, res.handlerLogin)
+
 // POST /auth/logout.html
-    authGroup.Post("/logout.html", res.handlerLogout)
+    // authGroup.Post("/logout.html", res.handlerLogout)
 
 // REGISTERED USERS ONLY:
 //Создание/Просмотр/Изменение/Удаление TODO.
-    myGroup := router.Group("/my", MWauthentication, MWheader, MWcsp)
+    // myGroup := router.Group("/my", MWauthentication, MWheader, MWcsp)
 
-/* ----------- TODOS: --------------*/
+/* ----------- Todo: --------------*/
 // GET  /my/todolist.html&uid=123
-    myGroup.Get("/todolist.html", res.pageUsertodo)
+    // myGroup.Get("/todolist.html", res.pageUserTodo)
 
 // POST /my/todoupdate.html&tid=123
-    myGroup.Post("/todoupdate.html", res.handlerUpdatetodo)
+    // myGroup.Post("/todoupdate.html", res.handlerUpdateTodo)
 // POST /my/tododelete.html&tid=123
-    myGroup.Post("/tododelete.html", res.handlerDeletetodo)
+    // myGroup.Post("/tododelete.html", res.handlerDeleteTodo)
 
 // GET /my/todonew.html
-    myGroup.Get("/todonew.html", res.pageSoon)
+    // myGroup.Get("/todonew.html", res.pageSoon)
 // POST /my/todonew.html
-    myGroup.Post("/todonew.html", res.pageSoon)
+    // myGroup.Post("/todonew.html", res.pageSoon)
 
 /* ---------USERS: ---------------- */
-    myGroup.Get("/userlist.html", res.pageUserList)
+    // myGroup.Get("/userlist.html", res.pageUserList)
 
     // POST /my/userdelete.html?uid=123
-    myGroup.Post("/userlist.html", res.pageSoon)
+    // myGroup.Post("/userlist.html", res.pageSoon)
 
 // GET  /my/userprofile.html?uid=123
-    myGroup.Get("/userprofile.html", res.pageUserProfile)
+    // myGroup.Get("/userprofile.html", res.pageUserProfile)
 // POST /my/userprofile.html
-    myGroup.Post("/userprofile.html", res.handlerUserProfile)
+    // myGroup.Post("/userprofile.html", res.handlerUserProfile)
 }

@@ -100,7 +100,7 @@ func main() {
 		},
     })
     router.Server().MaxConnsPerIP = 50
-    router.Static("/media", config.PicturetodossPath, fiber.Static{
+    router.Static("/media", config.PictureTodoPath, fiber.Static{
 	  Compress:      false,
 	  ByteRange:     true,
 	  Browse:        true,
@@ -144,7 +144,7 @@ func mountDinamicRouters(router *fiber.App, logger logz.Logger, db *dbcontext.DB
 	
 	healthcheck.RegisterHandlers(router, Version)
 	
-	todos.RegisterHandlers(router, todos.NewAgregator(todos.NewRepository(db, logger), logger), logger)
+	Todo.RegisterHandlers(router, Todo.NewAgregator(Todo.NewRepository(db, logger), logger), logger)
 }
 
 // logDBQuery returns a logging function that can be used to log SQL queries.

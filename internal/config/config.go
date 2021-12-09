@@ -20,7 +20,7 @@ const (
 	PictureSupportPath = "web/assets/support/"
 	UploadedPath = "assets/uploaded/"
 	PictureUserPath = "web/assets/userpic/"
-	PicturetodossPath = "web/assets/media/"
+	PictureTodoPath = "web/assets/media/"
 	CURRENCY = "грн"
 	BCRYPT_COST = 12
 	FSEP = "/"
@@ -75,7 +75,7 @@ func (c Config) Validate() error {
 		validation.Field(&c.RecaptchaSecret, validation.Required),
 		validation.Field(&c.MailSmtphost, validation.Required, is.URL),
 		validation.Field(&c.MailSmtpport, validation.Required),
-		validation.Field(&c.MailUsername, validation.Required, is.Email),
+		validation.Field(&c.MailUsername, validation.Required/*, is.Email*/),
 		validation.Field(&c.MailPassword, validation.Required),
 		validation.Field(&c.AppFqdn, validation.When(c.AppMode != "dev", validation.Required, is.URL).Else(validation.Required)),
 		validation.Field(&c.HttpEntrypoint, validation.Required),

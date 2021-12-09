@@ -1,4 +1,4 @@
-package todos
+package Todo
 
 import (
     "fmt"
@@ -111,31 +111,31 @@ func (res resource) handlerUserProfile(c *fiber.Ctx) error {
     return c.Redirect("/my/userprofile.html")
 }
 
-func (res resource) pageUsertodoss(c *fiber.Ctx) error {
+func (res resource) pageUserTodo(c *fiber.Ctx) error {
     uid := util.Pkeyer(c.Locals("iam"))
     curruser, err := res.agregator.GetUserById(c.UserContext(), uid)
     if err != nil {
         return c.Status(412).Render("error", fiber.Map{"msg": err})
     }
-    todossdisplay, err := res.agregator.GettodossDisplayByUserId(c.UserContext(), uid)
+    Tododisplay, err := res.agregator.GetTodoDisplayByUserId(c.UserContext(), uid)
     if err != nil {
         return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта")
     }
 
-    return c.Render("usertodoss", fiber.Map{
-        "msg": "usertodoss page: page: Coming soon!",
-        "todossdisplay": todossdisplay,
+    return c.Render("userTodo", fiber.Map{
+        "msg": "userTodo page: page: Coming soon!",
+        "Tododisplay": Tododisplay,
         "user": curruser,
     })
 }
 
-func (res resource) handlerDeletetodos(c *fiber.Ctx) error {
+func (res resource) handlerDeleteTodo(c *fiber.Ctx) error {
     uid := util.Pkeyer(c.Locals("iam"))
-    form := new(DeletetodosForm)
+    form := new(DeleteTodoForm)
     if err := c.BodyParser(form); err != nil && uid != 0 {
         return c.Status(500).Redirect("/error.html?msg=Ошибка обработки формы для удаления объявления")
     }
-    if err := res.agregator.DeletetodossData(c.UserContext(), form.TodoId); err != nil {
+    if err := res.agregator.DeleteTodoData(c.UserContext(), form.TodoId); err != nil {
         res.logger.With(c.UserContext()).Error(err.Error())
         return c.Status(500).Redirect("/error.html?msg=Ошибка удаления объявления")
     }

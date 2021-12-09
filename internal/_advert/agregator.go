@@ -1,4 +1,4 @@
-package todos
+package Todo
 
 import (
 	"context"
@@ -22,21 +22,16 @@ type Agregator interface {
 	GetUsersWithLimitOffset(ctx context.Context, limit, offset int64) ([]User, error)
 	GetUserById(ctx context.Context, id int64) (User, error)
 	GetUserByTodoId(ctx context.Context, aid int64) (User, error)
-	UpdateUserLastlogin(ctx context.Context, uid int64, dtstring string) error
 	GetUserByEmail(ctx context.Context, email string) (User, error)
-	GettodosById(ctx context.Context, id int64) (todos, error)
-	GettodossDisplayByUserId(ctx context.Context, uid int64) ([]todosDisplay, error)
-	GettodossLast(ctx context.Context) ([]todos, error)
-	GettodossSearch(ctx context.Context, clause string) ([]todos, error)
-	GettodossByUserId(ctx context.Context, uid int64) ([]todos, error)
-	DeletetodossData(ctx context.Context, aid int64) error
+	GetTodoById(ctx context.Context, id int64) (Todo, error)
+	GetTodoDisplayByUserId(ctx context.Context, uid int64) ([]TodoDisplay, error)
+	GetTodoLast(ctx context.Context) ([]Todo, error)
+	GetTodoSearch(ctx context.Context, clause string) ([]Todo, error)
+	GetTodoByUserId(ctx context.Context, uid int64) ([]Todo, error)
+	DeleteTodoData(ctx context.Context, aid int64) error
 	CreateUser(ctx context.Context, fdata *SignupForm, dtstring, roles, notes, avafile string) (int64, error)
-	GetMessagesSendersByUserId(ctx context.Context, uid int64) ([]MessageSender, error)
-	CreateMessage(ctx context.Context, fromId, toId int64, msg, dtstring string) error
 	UpdateUser(ctx context.Context, fdata *ProfileForm,uid int64, avafile string) error
-	UpdatetodossPicture(ctx context.Context, aid int64, field, fname string) error
-	Createtodos(ctx context.Context, f *QuicktodosForm, uid int64, dt string) (int64, error)
-	GetCategoriesPath(ctx context.Context) ([]CategoryPath, error)
+	CreateTodo(ctx context.Context, f *QuickTodoForm, uid int64, dt string) (int64, error)
 }
 
 type agregator struct {
@@ -44,7 +39,7 @@ type agregator struct {
 	logger log.Logger
 }
 
-type todos struct {
+type Todo struct {
 	entity.Todo
 }
 type Category struct {
@@ -62,11 +57,11 @@ type Message struct {
 type MessageSender struct {
 	dto.MessageSender
 }
-type todosDisplay struct {
-	dto.todosDisplay
+type TodoDisplay struct {
+	dto.TodoDisplay
 }
 
-type QuicktodosForm struct {
+type QuickTodoForm struct {
   Email       string  `json:"email" form:"email"`
   GivenName   string  `json:"given-name" form:"given-name"`
   CategoryId  int64   `json:"category_id" form:"category_id"`
@@ -80,8 +75,8 @@ type QuickSearchForm struct {
   Clause string     `json:"q" form:"q"`
 }
 
-// Validate validates the QuicktodosForm fields
-func (m QuicktodosForm) Validate() error {
+// Validate validates the QuickTodoForm fields
+func (m QuickTodoForm) Validate() error {
 	return vld.ValidateStruct(&m,
 		vld.Field(&m.GivenName, vld.Required, vld.Length(2, 128), vld.Match(regexp.MustCompile(`^(([a-zA-Z' -]{2,128})|([а-яА-ЯЁёІіЇїҐґЄє' -]{2,128}))`)), vld.By(swearDetector())),
 		vld.Field(&m.Email, vld.When(config.CFG.AppMode != "dev", vld.Required, is.Email).Else(vld.Required, is.EmailFormat)),
@@ -115,7 +110,7 @@ type ProfileForm struct {
 }
 // MessageForm represents an album update request.
 type MessageForm struct {
-	TodoId    int64   `json:"todos-id"        form:"todos-id"`
+	TodoId    int64   `json:"Todo-id"        form:"Todo-id"`
 	Email       string  `json:"email"        form:"email"`
 	GivenName   string  `json:"given-name"   form:"given-name"`
 	Msg         string  `json:"msg"          form:"msg"`
@@ -129,13 +124,13 @@ type SupportForm struct {
 	Msg         string  `json:"msg"          form:"msg"`
 }
 
-type DeletetodosForm struct {
-  TodoId int64  `json:"todos_id" form:"todos_id"`
+type DeleteTodoForm struct {
+  TodoId int64  `json:"Todo_id" form:"Todo_id"`
 }
 
 type WatchAuthorForm struct {
   RecaptchaResponse string  `json:"g-recaptcha-response" form:"g-recaptcha-response"`
-  TodoId int64  `json:"todos_id" form:"todos_id"`
+  TodoId int64  `json:"Todo_id" form:"Todo_id"`
   SignerUA string  `json:"signer_ua" form:"signer_ua"`
   SignerScreen string  `json:"signer_screen" form:"signer_screen"`
   SignerLangs string  `json:"signer_langs" form:"signer_langs"`
@@ -174,7 +169,7 @@ func swearDetector() vld.RuleFunc {
     }
 }
 
-// Validate validates the QuicktodosForm fields
+// Validate validates the QuickTodoForm fields
 func (m QuickSearchForm) Validate() error {
 	return vld.ValidateStruct(&m,
 		vld.Field(&m.Clause, vld.Required, vld.Length(3, 30), vld.By(swearDetector()), vld.Match(regexp.MustCompile(`^(([0-9a-zA-Z' -]{3,30})|([0-9а-яА-ЯЁёІіЇїҐґЄє' -]{3,30}))`))),
@@ -194,7 +189,7 @@ func (m WatchAuthorForm) Validate() error {
 	)
 }
 
-// Validate validates the QuicktodosForm fields
+// Validate validates the QuickTodoForm fields
 func (m LoginForm) Validate() error {
 	return vld.ValidateStruct(&m,
 		vld.Field(&m.Username, vld.When(config.CFG.AppMode != "dev", vld.Required, is.Email).Else(vld.Required, is.EmailFormat)),
@@ -234,28 +229,6 @@ func NewAgregator(repo Repository, logger log.Logger) agregator {
 	return agregator{repo, logger}
 }
 
-// Create creates a new album.
-func (ag agregator) CreateUser(ctx context.Context, sf *SignupForm, dtstring, roles, notes, avafile string) (int64, error) {
-	if roles == "" {
-		roles="guest"
-	}
-	if notes == "" {
-		notes="byregform"
-	}
-	return ag.repo.CreateUser(ctx, entity.User{
-    Name:     strings.Title(sf.GivenName),
-    Email:    sf.Email,
-    Tel:      util.PhoneNormalisation(sf.Tel),
-    Authkey:  util.GetSaltedSha256(config.CFG.AppSecretKey, sf.Email),
-    Passhash: util.MakeBCryptHash(sf.NewPassword, config.BCRYPT_COST),
-    Picture:   avafile,
-    Created:   dtstring,
-    Lastlogin: "2000-01-01 01:01:01",
-    Roles:     roles,
-    Notes:     notes,
-	})
-}
-
 // Update user.
 func (ag agregator) UpdateUser(ctx context.Context, pf *ProfileForm, uid int64, avafile string) error {
   // Save new User record
@@ -281,8 +254,8 @@ func (ag agregator) UpdateUser(ctx context.Context, pf *ProfileForm, uid int64, 
 	}, uid)
 }
 
-func (ag agregator) UpdatetodossPicture(ctx context.Context, aid int64, field, fname string) error {
-	return ag.repo.UpdatetodossPicture(ctx, aid, field, fname)
+func (ag agregator) UpdateTodoPicture(ctx context.Context, aid int64, field, fname string) error {
+	return ag.repo.UpdateTodoPicture(ctx, aid, field, fname)
 }
 
 func (ag agregator) UpdateUserLastlogin(ctx context.Context, uid int64, dtstring string) error {
@@ -311,25 +284,25 @@ func (ag agregator) GetUserByTodoId(ctx context.Context, aid int64) (User, error
 	return User{user}, nil
 }
 
-func (ag agregator) GettodosById(ctx context.Context, id int64) (todos, error) {
+func (ag agregator) GetTodoById(ctx context.Context, id int64) (Todo, error) {
 	if id == 0 {
-		return todos{}, nil
+		return Todo{}, nil
 	}
-	todos, err := ag.repo.GettodosById(ctx, id)
+	Todo, err := ag.repo.GetTodoById(ctx, id)
 	if err != nil {
-		return todos{}, err
+		return Todo{}, err
 	}
-	return todos{todos}, nil
+	return Todo{Todo}, nil
 }
 
-func (ag agregator) GettodossDisplayByUserId(ctx context.Context, uid int64) ([]todosDisplay, error) {
-	result := []todosDisplay{}
-	items, err := ag.repo.GettodossDisplayByUserId(ctx, uid)
+func (ag agregator) GetTodoDisplayByUserId(ctx context.Context, uid int64) ([]TodoDisplay, error) {
+	result := []TodoDisplay{}
+	items, err := ag.repo.GetTodoDisplayByUserId(ctx, uid)
 	if err != nil {
 		return result, err
 	}
 	for _, item := range items {
-		result = append(result, todosDisplay{item})
+		result = append(result, TodoDisplay{item})
 	}
 	return result, nil
 }
@@ -366,46 +339,46 @@ func (ag agregator) GetMessagesSendersByUserId(ctx context.Context, uid int64) (
 	return result, nil
 }
 
-func (ag agregator) GettodossLast(ctx context.Context) ([]todos, error) {
-	items, err := ag.repo.GettodossLast(ctx)
+func (ag agregator) GetTodoLast(ctx context.Context) ([]Todo, error) {
+	items, err := ag.repo.GetTodoLast(ctx)
 	if err != nil {
 		return nil, err
 	}
-	result := []todos{}
+	result := []Todo{}
 	for _, item := range items {
-		result = append(result, todos{item})
+		result = append(result, Todo{item})
 	}
 	return result, nil
 }
 
-func (ag agregator) GettodossSearch(ctx context.Context, clause string) ([]todos, error) {
-	items, err := ag.repo.GettodossSearch(ctx, clause)
+func (ag agregator) GetTodoSearch(ctx context.Context, clause string) ([]Todo, error) {
+	items, err := ag.repo.GetTodoSearch(ctx, clause)
 	if err != nil {
 		return nil, err
 	}
-	result := []todos{}
+	result := []Todo{}
 	for _, item := range items {
-		result = append(result, todos{item})
+		result = append(result, Todo{item})
 	}
 	return result, nil
 }
 
-func (ag agregator) GettodossByUserId(ctx context.Context, uid int64) ([]todos, error) {
-	items, err := ag.repo.GettodossByUserId(ctx, uid)
+func (ag agregator) GetTodoByUserId(ctx context.Context, uid int64) ([]Todo, error) {
+	items, err := ag.repo.GetTodoByUserId(ctx, uid)
 	if err != nil {
 		return nil, err
 	}
-	result := []todos{}
+	result := []Todo{}
 	for _, item := range items {
-		result = append(result, todos{item})
+		result = append(result, Todo{item})
 	}
 	return result, nil
 }
 
-func (ag agregator) DeletetodossData(ctx context.Context, aid int64) error {
+func (ag agregator) DeleteTodoData(ctx context.Context, aid int64) error {
 	aidStr := fmt.Sprint(aid)
-	pathes := config.PicturetodossPath + aidStr + "_*"
-  err := ag.repo.DeletetodosById(ctx, aid)
+	pathes := config.PictureTodoPath + aidStr + "_*"
+  err := ag.repo.DeleteTodoById(ctx, aid)
   if err != nil {
       ag.logger.With(ctx).Error(err.Error())
       return err
@@ -413,12 +386,12 @@ func (ag agregator) DeletetodossData(ctx context.Context, aid int64) error {
 	return util.FileDeletionByMask(ctx, pathes)
 }
 
-// Create creates a new todos.
-func (ag agregator) Createtodos(ctx context.Context, f *QuicktodosForm, uid int64, dt string) (int64, error) {
+// Create creates a new Todo.
+func (ag agregator) CreateTodo(ctx context.Context, f *QuickTodoForm, uid int64, dt string) (int64, error) {
 	if uid == 0 {
-		return 0, errors.New("Createtodos User_id:0")
+		return 0, errors.New("CreateTodo User_id:0")
 	}
-	return ag.repo.Createtodos(ctx, entity.todos{
+	return ag.repo.CreateTodo(ctx, entity.Todo{
 	  UserId: uid,
 	  CategoryId: util.Pkeyer(f.CategoryId),
 	  Title: util.ExtractTitle(f.Nanopost, 45, 4),

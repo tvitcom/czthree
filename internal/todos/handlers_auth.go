@@ -2,11 +2,12 @@ package Todo
 
 import (
     "time"
+    "fmt"
     // "errors"
     "github.com/gofiber/fiber/v2"
     // "github.com/tvitcom/czthree/pkg/log"
-    // "github.com/tvitcom/czthree/internal/config"
-    // "github.com/tvitcom/czthree/pkg/util"  
+    "github.com/tvitcom/czthree/internal/config"
+    "github.com/tvitcom/czthree/pkg/util"  
 )
 
 
@@ -18,29 +19,29 @@ func (res resource) pageLogin(c *fiber.Ctx) error {
 
 func (res resource) handlerLogin(c *fiber.Ctx) error {
     // handle_dt := time.Now().Format("2006-01-02 15:04:05")
-    // form := new(LoginForm)
-    // if err := c.BodyParser(form); err != nil {
-    //     res.logger.With(c.UserContext()).Error(err.Error())
-    //     return c.Status(412).Render("error", fiber.Map{"msg": err})
-    // }
+    form := new(LoginForm)
+    if err := c.BodyParser(form); err != nil {
+        res.logger.With(c.UserContext()).Error(err.Error())
+        return c.Status(412).Render("error", fiber.Map{"msg": err})
+    }
     // validation    
-    // if err := form.Validate(); err != nil {
-    //     return c.Status(403).Render("error", fiber.Map{
-    //         "msg": "Неверно введены данные формы логина",
-    //     })
-    // }
+    if err := form.Validate(); err != nil {
+        return c.Status(403).Render("error", fiber.Map{
+            "msg": "Неверно введены данные формы логина",
+        })
+    }
     
-    // user, err := res.agregator.GetUserByEmail(c.UserContext(), form.Username)
+    user, err := res.agregator.GetUserByEmail(c.UserContext(), form.Username)
  
-    // currentHash := util.MakeBCryptHash(form.CurrentPassword, config.BCRYPT_COST)
-    // fmt.Println("THAT PASSWORD:", currentHash)
-    // fmt.Printf("SQL: UPDATE user SET passhash = '%s' WHERE email = '%s';\n", currentHash, form.Username)
+    currentHash := util.MakeBCryptHash(form.CurrentPassword, config.BCRYPT_COST)
+fmt.Println("THAT PASSWORD:", currentHash)
+fmt.Printf("SQL: UPDATE user SET passhash = '%s' WHERE email = '%s';\n", currentHash, form.Username)
     
-    // if err != nil || util.VerifyBCrypt(form.CurrentPassword, user.Passhash) != nil {
-        // return c.Status(403).Render("error", fiber.Map{
-        //     "msg": "Неверно ввели логин или пароль или всё вместе",
-        // })
-    // }
+    if err != nil || util.VerifyBCrypt(form.CurrentPassword, user.Passhash) != nil {
+        return c.Status(403).Render("error", fiber.Map{
+            "msg": "Неверно ввели логин или пароль или всё вместе",
+        })
+    }
     // Update the user.lastlogin
     // if err := res.agregator.UpdateUserLastlogin(c.UserContext(), user.UserId, handle_dt); err != nil {
     //     return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта")
@@ -48,12 +49,12 @@ func (res resource) handlerLogin(c *fiber.Ctx) error {
     
     // Let identity marker - user authenticated successfully
     // seckey, tokid, fqdn, uid, appsid, roles
-    // rnd32 := util.RandomHexString(8)
-    // tok, err := util.MakeJwtString(config.CFG.AppSecretKey, rnd32, config.CFG.AppFqdn, util.Stringer(user.UserId), "main", "user")
-    // if err != nil {
-    //     return c.Status(403).Render("error", fiber.Map{"msg": err})
-    // }
-    // makeJWTCookie(c, tok)
+    rnd32 := util.RandomHexString(8)
+    tok, err := util.MakeJwtString(config.CFG.AppSecretKey, rnd32, config.CFG.AppFqdn, util.Stringer(user.UserId), "main", "user")
+    if err != nil {
+        return c.Status(403).Render("error", fiber.Map{"msg": err})
+    }
+    makeJWTCookie(c, tok)
     return c.Redirect("/my/userTodo.html", 301)
 }
 func (res resource) handlerLogout(c *fiber.Ctx) error {

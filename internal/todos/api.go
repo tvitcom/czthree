@@ -1,9 +1,9 @@
 package Todo
 
 import (
-    // "time"
+    "time"
 	"github.com/gofiber/fiber/v2"
-    // "github.com/gofiber/fiber/v2/middleware/limiter"
+    "github.com/gofiber/fiber/v2/middleware/limiter"
     "github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/tvitcom/czthree/pkg/log"
     "github.com/tvitcom/czthree/pkg/util"
@@ -54,6 +54,7 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
         return c.Next()
     }
     */
+    
     MWuserinfo := func(c *fiber.Ctx) error {
         tryjwt := c.Cookies("tok","")
         // Cookie empty
@@ -66,7 +67,7 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
         }
         return c.Next()
     }
-    /*
+    
     MWnouser := func(c *fiber.Ctx) error {
         mwuid := c.Locals("iam")
         if mwuid != nil {
@@ -74,7 +75,7 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
         }
         return c.Next()
     }
-    */
+    
     MWcsp := func(c *fiber.Ctx) error {
             // require-trusted-types-for 'script';
         csp := `
@@ -110,7 +111,7 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
         c.Append("X-Frame-Options", "SAMEORIGIN")
         return c.Next()
     }
-    /*
+    
     MWRateLim := limiter.New(limiter.Config{
         Next: func(c *fiber.Ctx) bool {
             return c.IP() == "127.0.0.1"
@@ -127,7 +128,7 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
             })
         },
     })
-	*/
+	
     
 // GET  /index.html?loc=Kharkovskaya&cat=123&q=qwerty
     // router.Use(MWRateLim)
@@ -137,13 +138,13 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
     
 	router.Get("/", MWuserinfo, MWcsp, res.pageIndex)
 // RATELIMITED PAGES:
-    // authGroup := router.Group("/auth", MWRateLim, MWuserinfo, MWcsp)
+    authGroup := router.Group("/auth", MWRateLim, MWuserinfo, MWcsp)
 
 // GET  /auth/login.html?uid=1234&aprove=mail&otcode=123qwerty5467
-	// authGroup.Get("/login.html", MWnouser, res.pageLogin)
+	authGroup.Get("/login.html", MWnouser, res.pageLogin)
 
 // POST /auth/login.html?aprove=mail
-	// authGroup.Post("/login.html", MWnouser, res.handlerLogin)
+	authGroup.Post("/login.html", MWnouser, res.handlerLogin)
 
 // POST /auth/logout.html
     // authGroup.Post("/logout.html", res.handlerLogout)

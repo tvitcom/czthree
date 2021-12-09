@@ -2,7 +2,7 @@ package Todo
 
 import (
     "time"
-    "fmt"
+    // "fmt"
     // "errors"
     "github.com/gofiber/fiber/v2"
     // "github.com/tvitcom/czthree/pkg/log"
@@ -33,9 +33,9 @@ func (res resource) handlerLogin(c *fiber.Ctx) error {
     
     user, err := res.agregator.GetUserByEmail(c.UserContext(), form.Username)
  
-    currentHash := util.MakeBCryptHash(form.CurrentPassword, config.BCRYPT_COST)
-fmt.Println("THAT PASSWORD:", currentHash)
-fmt.Printf("SQL: UPDATE user SET passhash = '%s' WHERE email = '%s';\n", currentHash, form.Username)
+    // currentHash := util.MakeBCryptHash(form.CurrentPassword, config.BCRYPT_COST)
+    // fmt.Println("THAT PASSWORD:", currentHash)
+    // fmt.Printf("SQL: UPDATE user SET passhash = '%s' WHERE email = '%s';\n", currentHash, form.Username)
     
     if err != nil || util.VerifyBCrypt(form.CurrentPassword, user.Passhash) != nil {
         return c.Status(403).Render("error", fiber.Map{
@@ -55,10 +55,10 @@ fmt.Printf("SQL: UPDATE user SET passhash = '%s' WHERE email = '%s';\n", current
         return c.Status(403).Render("error", fiber.Map{"msg": err})
     }
     makeJWTCookie(c, tok)
-    return c.Redirect("/my/userTodo.html", 301)
+    return c.Redirect("/my/todolist.html", 301)
 }
 func (res resource) handlerLogout(c *fiber.Ctx) error {
-    // deleteJWTCookie(c)
+    deleteJWTCookie(c)
     return c.Render("thanks", fiber.Map{
         "msg": "за посещение сайта. Удачных сделок!",
     })

@@ -6,19 +6,19 @@ import (
     // "errors"
     "github.com/gofiber/fiber/v2"
     // "github.com/tvitcom/czthree/internal/config"
-    // "github.com/tvitcom/czthree/pkg/util"  
+    "github.com/tvitcom/czthree/pkg/util"  
     
 )
 
 func (res resource) pageUserProfile(c *fiber.Ctx) error {
-    // uid := util.Pkeyer(c.Locals("iam"))
-    // user, err := res.agregator.GetUserById(c.UserContext(), uid)
-    // if err != nil {
-    //     return err
-    // }
+    uid := util.Pkeyer(c.Locals("iam"))
+    user, err := res.agregator.GetUserById(c.UserContext(), uid)
+    if err != nil {
+        return err
+    }
     return c.Render("userprofile", fiber.Map{
         "msg": "редактирование данных",
-        // "user": user,
+        "user": user,
     })
 }
 
@@ -112,20 +112,20 @@ func (res resource) handlerUserProfile(c *fiber.Ctx) error {
 }
 
 func (res resource) pageUserTodo(c *fiber.Ctx) error {
-    // uid := util.Pkeyer(c.Locals("iam"))
-    // curruser, err := res.agregator.GetUserById(c.UserContext(), uid)
-    // if err != nil {
-    //     return c.Status(412).Render("error", fiber.Map{"msg": err})
-    // }
+    uid := util.Pkeyer(c.Locals("iam"))
+    curruser, err := res.agregator.GetUserById(c.UserContext(), uid)
+    if err != nil {
+        return c.Status(412).Render("error", fiber.Map{"msg": err})
+    }
     // Tododisplay, err := res.agregator.GetTodoDisplayByUserId(c.UserContext(), uid)
     // if err != nil {
     //     return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта")
     // }
 
-    return c.Render("userTodo", fiber.Map{
+    return c.Render("todolist", fiber.Map{
         "msg": "userTodo page: page: Coming soon!",
         // "Tododisplay": Tododisplay,
-        // "user": curruser,
+        "user": curruser,
     })
 }
 
@@ -160,21 +160,21 @@ func (res resource) handlerUpdateTodo(c *fiber.Ctx) error {
 }
 
 func (res resource) pageUserList(c *fiber.Ctx) error {
-    // uid := util.Pkeyer(c.Locals("iam"))
-    // if uid > 1 { // Non admin with id=1 go ahead
-    //     return c.Status(403).Render("error", fiber.Map{"msg": "Unauthorised"})
-    // }
-    // curruser, err := res.agregator.GetUserById(c.UserContext(), uid)
-    // if err != nil {
-    //     return c.Status(412).Render("error", fiber.Map{"msg": err})
-    // }
-    // users, err := res.agregator.GetUsersWithLimitOffset(c.UserContext(), 1000, 0)
-    // if err != nil {
-    //     return c.Status(412).Render("error", fiber.Map{"msg": err})
-    // }
+    uid := util.Pkeyer(c.Locals("iam"))
+    if uid > 1 { // Non admin with id=1 go ahead
+        return c.Status(403).Render("error", fiber.Map{"msg": "Unauthorised"})
+    }
+    curruser, err := res.agregator.GetUserById(c.UserContext(), uid)
+    if err != nil {
+        return c.Status(412).Render("error", fiber.Map{"msg": err})
+    }
+    users, err := res.agregator.GetUsersWithLimitOffset(c.UserContext(), 1000, 0)
+    if err != nil {
+        return c.Status(412).Render("error", fiber.Map{"msg": err})
+    }
     return c.Render("userlist", fiber.Map{
         "msg": "userlist page: page: Coming soon!",
-        // "user": curruser,
-        // "users": users,
+        "user": curruser,
+        "users": users,
     })
 }

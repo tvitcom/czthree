@@ -21,7 +21,6 @@ type (
 // RegisterHandlers sets up the routing of the HTTP handlers.
 func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger) {
 	res := resource{agregator, logger}
-    /*
     MWheader := func(c *fiber.Ctx) error {
         c.Append("Powered-by", config.CFG.WebservName)
         
@@ -37,6 +36,7 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
           // Set some security headers:
         return c.Next()
     }
+    
     MWauthentication := func(c *fiber.Ctx) error {
         c.Append("Restricted-by", "jwt")
         tryjwt := c.Cookies("tok","~")
@@ -53,7 +53,6 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
         _ = c.Locals("iam", fastjson.GetString(tokdata, "sub"))
         return c.Next()
     }
-    */
     
     MWuserinfo := func(c *fiber.Ctx) error {
         tryjwt := c.Cookies("tok","")
@@ -71,7 +70,7 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
     MWnouser := func(c *fiber.Ctx) error {
         mwuid := c.Locals("iam")
         if mwuid != nil {
-            return c.Redirect("/my/userTodo.html", 301)
+            return c.Redirect("/my/todolist.html", 301)
         }
         return c.Next()
     }
@@ -147,15 +146,15 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
 	authGroup.Post("/login.html", MWnouser, res.handlerLogin)
 
 // POST /auth/logout.html
-    // authGroup.Post("/logout.html", res.handlerLogout)
+    authGroup.Post("/logout.html", res.handlerLogout)
 
 // REGISTERED USERS ONLY:
 //Создание/Просмотр/Изменение/Удаление TODO.
-    // myGroup := router.Group("/my", MWauthentication, MWheader, MWcsp)
+    myGroup := router.Group("/my", MWauthentication, MWheader, MWcsp)
 
 /* ----------- Todo: --------------*/
 // GET  /my/todolist.html&uid=123
-    // myGroup.Get("/todolist.html", res.pageUserTodo)
+    myGroup.Get("/todolist.html", res.pageUserTodo)
 
 // POST /my/todoupdate.html&tid=123
     // myGroup.Post("/todoupdate.html", res.handlerUpdateTodo)
@@ -168,13 +167,13 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
     // myGroup.Post("/todonew.html", res.pageSoon)
 
 /* ---------USERS: ---------------- */
-    // myGroup.Get("/userlist.html", res.pageUserList)
+    myGroup.Get("/userlist.html", res.pageUserList)
 
     // POST /my/userdelete.html?uid=123
-    // myGroup.Post("/userlist.html", res.pageSoon)
+    myGroup.Post("/userlist.html", res.pageSoon)
 
 // GET  /my/userprofile.html?uid=123
-    // myGroup.Get("/userprofile.html", res.pageUserProfile)
+    myGroup.Get("/userprofile.html", res.pageUserProfile)
 // POST /my/userprofile.html
-    // myGroup.Post("/userprofile.html", res.handlerUserProfile)
+    myGroup.Post("/userprofile.html", res.handlerUserProfile)
 }

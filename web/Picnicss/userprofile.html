@@ -4,8 +4,8 @@
 <title>czthree - Профиль пользователя {{ .user.Name }}</title>
 <meta charset="utf-8"><meta name="theme-color" content="#317EFB"/>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="keywords" content="объявления, разместить, бесплатно, Харьков, Украина, купить, рубрика, категория, аренда, авто, велосипед, спорт, услуги, мастера, компьютер, мебель, ремонт">
-<meta name="description" content="Тодо сайт частных объявлений города Харьков">
+<meta name="keywords" content="">
+<meta name="description" content="Тодо сайт">
 <link rel="stylesheet" href="/assets/style/style.css">
 <link rel="icon" href="/assets/img/basket.png" type="image/png">
 <link rel="stylesheet" media="screen" href="/assets/style/prism.css">
@@ -98,9 +98,7 @@ aside .links a.button {
     <a href="/index.html" class="brand" hreflang="ru"><span>czthree</span></a>
     <input id="bmenu" type="checkbox" class="show"><label for="bmenu" class="burger toggle pseudo button">Открыть меню</label>
     <div class="menu">
-      <a href="/index.html" class="pseudo button">На главную</a>
-      <a href="/publication.html#form" target="_self" class="button success">Разместить</a>
-      <a href="/publication.html#about" target="_self" class="button">О сайте</a>
+      <a href="/" class="pseudo button">На главную</a>
       <button form="logoutlink" class="button warming">Выход</button>
     </div>
   </nav>
@@ -110,10 +108,7 @@ aside .links a.button {
         <h2>Разделы</h2>
         <div class="links flex two three-500 five-800 one-1000">
           <div>
-            <a class="pseudo button" href="/my/userTodo.html">Объявления</a>
-          </div>
-          <div>
-            <a class="pseudo button" href="/my/usermessages.html">Сообщения</a>
+            <a class="pseudo button" href="/my/todolist.html">Дела</a>
           </div>
           {{if eq .user.UserId 1 }}
           <div>
@@ -130,24 +125,18 @@ aside .links a.button {
 
 <div class="visual">
 <h3 id="positions">Профиль {{ .msg }}</h3>
-<style>
+<!-- style>
   .miniprofile {
   border-radius: 50%;    /* Make it a circle */
   margin: 0 auto;        /* Center horizontally */
   width: 60%;            /* 60% width */
   padding-bottom: 60%;   /* 60% height */
 }
-</style>
+</style-->
 <form id="userprofile" method="post" enctype="multipart/form-data" action="/my/userprofile.html" target="_self">
-<div style="width: 200px;margin:40px;">
-  <label class="dropimage miniprofile" style="background-image: url(/userpic/{{ .user.UserId }}/{{ .user.Picture }})">
-    <input name="picture" title="Клик для выбора фото для загрузки (.jpeg)" type="file" accept="image/jpeg">
-  </label>
-</div>
 <fieldset class="flex three-600 one-400">
   <label><input type="name" placeholder="Имя" name="given-name" value="{{ .user.Name }}" autofocus="autofocus" minlength="2" maxlength="64" pattern="[a-zA-Zа-яёА-ЯЁїЇіІґҐ\s\.\,\-\']{2,64}" required="required"></label>
-  <label><input type="tel" name="tel" value="{{.user.Tel}}" placeholder="Телефон" pattern="[\d\s\-\+\(\)]{10,21}" autocomplete="tel"></label>
-  <label><input form="anotherdummyform" type="email" name="email" value="{{.user.Email}}" placeholder="E-mail" disabled></label>
+  <label><input form="userprofile" type="email" name="email" value="{{.user.Email}}" placeholder="E-mail" disabled></label>
 </fieldset>
 <fieldset class="flex two-600 one-400">
   <label>

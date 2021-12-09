@@ -23,6 +23,7 @@ type Agregator interface {
 	GetTodoById(ctx context.Context, id int64) (Todo, error)
 	GetTodoDisplayByUserId(ctx context.Context, uid int64) ([]TodoDisplay, error)
 	GetTodoByUserId(ctx context.Context, uid int64) ([]Todo, error)
+	UpdateTodo(ctx context.Context, fdata *UpdateTodoForm, uid int64) error
 	DeleteTodoData(ctx context.Context, aid int64) error
 	UpdateUser(ctx context.Context, fdata *ProfileForm,uid int64, avafile string) error
 	CreateTodo(ctx context.Context, f *TodoForm, uid, perfid int64, dt string) (int64, error)
@@ -65,6 +66,11 @@ type LoginForm struct {
 	Username          string  `json:"username"        form:"username"`
 	CurrentPassword   string  `json:"current-password" form:"current-password"`
 }
+// pdateTodoForm represents an album update request.
+type UpdateTodoForm struct {
+	TodoId   int64  `json:"todoid" form:"todoit"`
+	Status   int    `json:"status" form:"status"`
+}
 // ProfileForm represents an album update request.
 type ProfileForm struct {
 	Tel               string  `json:"tel"          form:"tel"`
@@ -82,6 +88,14 @@ func (m LoginForm) Validate() error {
 	return vld.ValidateStruct(&m,
 		vld.Field(&m.Username, vld.When(config.CFG.AppMode != "dev", vld.Required, is.Email).Else(vld.Required, is.EmailFormat)),
 		vld.Field(&m.CurrentPassword, vld.Required, vld.Length(6, 128)),
+	)
+}
+
+// Validate validates the LoginForm fields
+func (f UpdateTodoForm) Validate() error {
+	return vld.ValidateStruct(&f,
+		vld.Field(&f.TodoId, vld.Required),
+		vld.Field(&f.Status, vld.Required),
 	)
 }
 
@@ -108,6 +122,17 @@ func passwordsEquals(str string) vld.RuleFunc {
 // NewAgregator creates a new album agregator.
 func NewAgregator(repo Repository, logger log.Logger) agregator {
 	return agregator{repo, logger}
+}
+
+// Update user.
+func (ag agregator) UpdateTodo(ctx context.Context, tdf *UpdateTodoForm, uid int64) error {
+	return ag.repo.UpdateTodo(ctx, 
+		entity.Todo{
+	    TodoId: tdf.TodoId,
+	    Status: tdf.Status,
+		}, 
+		uid,
+	)
 }
 
 // Update user.

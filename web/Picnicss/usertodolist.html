@@ -94,9 +94,9 @@ aside .links a.button {
 </style>
 </head>
 <body>
-  <form id="logoutlink" method="post" enctype="multipart/form-data" action="/auth/logout.html" target="_self"></form>
+  <form id="todochange" method="post" enctype="multipart/form-data" action="/my/todochange.html" target="_self"></form>
   <nav>
-    <a href="/index.html" class="brand" hreflang="ru"><span>czthree</span></a>
+    <a href="/" class="brand" hreflang="ru"><span>czthree</span></a>
     <input id="bmenu" type="checkbox" class="show"><label for="bmenu" class="burger toggle pseudo button">Открыть меню</label>
     <div class="menu">
       <a href="/" class="pseudo button">На главную</a>
@@ -140,8 +140,8 @@ aside .links a.button {
     <tr>
       <td><a href="/my/todoview.html?todoid={{ .TodoId }}" title="Открыть" target="_self">{{ .TodoId }}</a></td>
       <td>{{ .Name }}</td>
-      <td>{{ if eq .Status 1 }} задано {{else}} <font color=green>выполнено</font> {{end}}</td>
-      <td><button onclick='changeTodoStatus();'>Закрыть</button></td>
+      <td>{{ if eq .Status 1 }} задано {{else}} <font color=green>готово</font> {{end}}</td>
+      <td><button form="todochange" formaction="/my/todochange.html?todoid={{ .TodoId }}" value="2" name="status">Завершить</button></td>
     </tr>
     {{ end }}
     <!-- <tr>
@@ -205,11 +205,5 @@ u([window]).on('scroll', function(){
   var top = this.scrollY || document.documentElement.scrollTop;
   u('.top').toggleClass('visible', top > 1000);
 }).trigger('scroll');</script>
-<script>
-  function changeTodoStatus(e) {
-    console.log("ready");
-    return false;
-  }
-</script>
 </body>
 </html>

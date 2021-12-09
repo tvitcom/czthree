@@ -1,7 +1,7 @@
 package Todo
 
 import (
-    // "fmt"
+    "fmt"
     // "time"
     // "errors"
     "github.com/gofiber/fiber/v2"
@@ -146,18 +146,22 @@ func (res resource) handlerDeleteTodo(c *fiber.Ctx) error {
 }
 
 func (res resource) handlerUpdateTodo(c *fiber.Ctx) error {
-    // uid := util.Pkeyer(c.Locals("iam"))
-    // form := new(DeleteTodoForm)
-    // if err := c.BodyParser(form); err != nil && uid != 0 {
-    //     return c.Status(500).Redirect("/error.html?msg=Ошибка обработки формы для удаления объявления")
-    // }
-    // if err := res.agregator.DeleteTodoData(c.UserContext(), form.TodoId); err != nil {
-    //     res.logger.With(c.UserContext()).Error(err.Error())
-    //     return c.Status(500).Redirect("/error.html?msg=Ошибка удаления объявления")
-    // }
-    return c.Status(201).Render("thanks", fiber.Map{
-        "msg": "Объявление и его фотографии успешно удалены",
-    })
+    uid := util.Pkeyer(c.Locals("iam"))
+    form := new(UpdateTodoForm)
+    form.TodoId = util.Pkeyer(c.Query("todoid", "0"))
+    if err := c.BodyParser(form); err != nil && uid != 0 {
+        return c.Status(500).Redirect("/error.html?msg=Ошибка обработки формы для смены статуса todo")
+    }
+    // Form validation
+    fmt.Printf("FORM: %v", form)
+    if err := form.Validate(); err != nil {
+        return c.Status(412).Render("error", fiber.Map{"msg": err})
+    }
+    if err := res.agregator.UpdateTodo(c.UserContext(), form, uid); err != nil {
+        res.logger.With(c.UserContext()).Error(err.Error())
+        return c.Status(500).Redirect("/error.html?msg=Ошибка удаления объявления")
+    }
+    return c.Status(302).Redirect("/my/todolist.html")
 }
 
 func (res resource) pageUserList(c *fiber.Ctx) error {

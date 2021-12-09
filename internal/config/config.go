@@ -13,6 +13,9 @@ import (
 )
 
 const (
+	ADM_ROLE = 100
+	USER_ROLE = 10
+	GUEST_ROLE=0
 	SupportUserID = 1 // The only user with user_id = 1 allow direct support messages
 	defaultJWTExpirationHours = 2
 	RobotsFilePath = "assets/seo/robots.txt"

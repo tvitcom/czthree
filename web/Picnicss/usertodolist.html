@@ -129,21 +129,19 @@ aside .links a.button {
 <table class="primary">
   <thead>
     <tr>
-      <th>заголовок</th>
-      <th>дата</th>
-      <th>категория</th>
-      <th>модерация</th>
-      <th>активно</th>
+      <th>№</th>
+      <th>название</th>
+      <th>статус</th>
+      <th>готово</th>
     </tr>
   </thead>
   <tbody>
-    {{ range .Tododisplay }}
+    {{ range .TodoDisplay }}
     <tr>
-      <td><a href="/watch.html?todoid={{ .TodoId }}" title="Открыть" target="_self">{{ .Title }}</a></td>
-      <td>{{ .Created }}</td>
-      <td>{{ .CategoryName }}</td>
-      <td>{{ .ModeratorId }}</td>
-      <td>{{ .Active }}</td>
+      <td><a href="/my/todoview.html?todoid={{ .TodoId }}" title="Открыть" target="_self">{{ .TodoId }}</a></td>
+      <td>{{ .Name }}</td>
+      <td>{{ if eq .Status 1 }} задано {{else}} <font color=green>выполнено</font> {{end}}</td>
+      <td><button onclick='changeTodoStatus();'>Закрыть</button></td>
     </tr>
     {{ end }}
     <!-- <tr>
@@ -206,8 +204,12 @@ u('aside a').on('click', function(e){
 u([window]).on('scroll', function(){
   var top = this.scrollY || document.documentElement.scrollTop;
   u('.top').toggleClass('visible', top > 1000);
-}).trigger('scroll');</script><script>window.onload = function(){
-
+}).trigger('scroll');</script>
+<script>
+  function changeTodoStatus(e) {
+    console.log("ready");
+    return false;
+  }
 </script>
 </body>
 </html>

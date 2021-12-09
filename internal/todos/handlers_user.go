@@ -117,14 +117,15 @@ func (res resource) pageUserTodo(c *fiber.Ctx) error {
     if err != nil {
         return c.Status(412).Render("error", fiber.Map{"msg": err})
     }
-    // Tododisplay, err := res.agregator.GetTodoDisplayByUserId(c.UserContext(), uid)
-    // if err != nil {
-    //     return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта")
-    // }
+    TodoDisplay, err := res.agregator.GetTodoDisplayByUserId(c.UserContext(), uid)
+    if err != nil {
+        println("DBERR:", err.Error())
+        return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта")
+    }
 
     return c.Render("usertodolist", fiber.Map{
         "msg": "userTodo page: page: Coming soon!",
-        // "Tododisplay": Tododisplay,
+        "TodoDisplay": TodoDisplay,
         "user": curruser,
     })
 }

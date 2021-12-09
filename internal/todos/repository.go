@@ -107,16 +107,10 @@ func (r repository) CreateTodo(ctx context.Context, Todo entity.Todo) (int64, er
 
 // return Todo records in the database.
 func (r repository) GetTodoDisplayByUserId(ctx context.Context, uid int64) ([]dto.TodoDisplay, error) {
-	var Todo []dto.TodoDisplay
-	sql := `
-	SELECT a.Todo_id, c.name category_name, a.title, a.price, a.currency, a.moderator_id, a.created, a.active 
-	FROM Todo a, category c 
-	WHERE a.category_id = c.category_id AND a.user_id = {:uid}
-	GROUP BY a.category_id 
-	ORDER BY a.created ASC 
-	LIMIT 100;`
-	err := r.db.With(ctx).NewQuery(sql).Bind(dbx.Params{"uid": uid}).All(&Todo)
-	return Todo, err
+	var Todos []dto.TodoDisplay
+	sql := `SELECT t.todo_id, u.name manager, t.perfomer_id, t.name, t.status FROM todo t, user u WHERE t.perfomer_id = u.user_id AND t.perfomer_id = {:uid} ORDER BY t.status ASC`
+	err := r.db.With(ctx).NewQuery(sql).Bind(dbx.Params{"uid": uid}).All(&Todos)
+	return Todos, err
 }
 
 // returns recently added Todo records

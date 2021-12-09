@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Dec 08, 2021 at 06:34 PM
+-- Generation Time: Dec 09, 2021 at 09:43 AM
 -- Server version: 8.0.27
 -- PHP Version: 7.3.31-1~deb10u1
 
@@ -40,7 +40,7 @@ CREATE TABLE `todo` (
 --
 
 INSERT INTO `todo` (`todo_id`, `author_id`, `perfomer_id`, `name`, `status`) VALUES
-(1, 1, 1, 'Запланировать задачи сотрудникам', 1),
+(1, 1, 1, 'ЗАпланировать задачи сотрудникам', 1),
 (2, 1, 2, 'Высотные работы№1 по плану 1', 1),
 (3, 1, 2, 'Высотные работы№2 по плану 1', 1),
 (4, 1, 3, 'Подготовка высотных работ по плану 1', 1);
@@ -64,9 +64,9 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `name`, `email`, `passhash`, `role`) VALUES
-(1, 'admin', 'admin@gmail.com', '$argon2id$v=19$m=131072,t=10,p=4$/82awZJE2fiasPGDeOjAmg$qc3f278rv+YOUSwRXGToL/nOaNwc/ezqfYphxH83YDc', 100),
-(2, 'demo', 'demo@mail.ru', '$argon2id$v=19$m=131072,t=10,p=4$Ehavo4cjGkGHUzlhvj3Csw$eiO15pWJnkSj3lFdKyV8x/DYPfkMcd6D346BrKP+a80', 10),
-(3, 'Vaso', 'vaso@mail.ru', '$argon2id$v=19$m=131072,t=10,p=4$cqBgweNZKiUD1c8mWW4lTw$6bFr1zq6Y88mk4AS/NIOSz5T5L3Pb1oIboQd+dtAQZw', 10);
+(1, 'admin', 'admin@gmail.com', '$2a$12$RNw.W2JPNHRmlBbxKw5aiuDUW1OdojjOKb/68BXNsThqtc/jM2vf.', 100),
+(2, 'demo', 'demo@mail.ru', '$2a$12$FnKg9DqpDeDzpThkouc1b.SbZy4qAqgKBGohswrWBlzr7jDDrKYOW', 10),
+(3, 'Vaso', 'vaso@mail.ru', '$2a$12$dcWMn4UGnRcEhVsDeYpD1OWkc5fQpogXqUTyKwXZzKjPNAjbYA4xC', 10);
 
 --
 -- Indexes for dumped tables

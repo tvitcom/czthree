@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<title>czthree - Объявления пользователя {{ .user.Name }}</title>
+<title>czthree - Дела пользователя {{ .user.Name }}</title>
 <meta charset="utf-8"><meta name="theme-color" content="#317EFB"/>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="keywords" content="объявления, разместить, бесплатно, Харьков, Украина, купить, рубрика, категория, аренда, авто, велосипед, спорт, услуги, мастера, компьютер, мебель, ремонт">
+<meta name="keywords" content="Дела, разместить, бесплатно, Харьков, Украина, купить, рубрика, категория, аренда, авто, велосипед, спорт, услуги, мастера, компьютер, мебель, ремонт">
 <meta name="description" content="Тодо сайт частных объявлений города Харьков">
 <link rel="preload" href="/assets/style/style.css" as="style">
 <link rel="stylesheet" href="/assets/style/style.css">
@@ -109,7 +109,7 @@ aside .links a.button {
         <h2>Разделы</h2>
         <div class="links flex two three-500 five-800 one-1000">
           <div>
-            <a class="pseudo button" href="/my/userTodo.html"><b>Объявления</b></a>
+            <a class="pseudo button" href="/my/userTodo.html"><b>Дела</b></a>
           </div>
           {{if eq .user.UserId 1 }}
           <div>
@@ -125,7 +125,7 @@ aside .links a.button {
       <article class="full four-fifth-1000">
         
 
-<h2 id="tabs">Объявления</h2>
+<h2 id="tabs">Дела</h2>
 <table class="primary">
   <thead>
     <tr>
@@ -208,17 +208,6 @@ u([window]).on('scroll', function(){
   u('.top').toggleClass('visible', top > 1000);
 }).trigger('scroll');</script><script>window.onload = function(){
 
-  // Dropimage handler
-  [].forEach.call(document.querySelectorAll('.dropimage'), function(img){
-    img.onchange = function(e){
-      var inputfile = this, reader = new FileReader();
-      reader.onloadend = function(){
-        inputfile.style['background-image'] = 'url('+reader.result+')';
-        }
-      reader.readAsDataURL(e.target.files[0]);
-      }
-    });
-  };
 </script>
 </body>
 </html>

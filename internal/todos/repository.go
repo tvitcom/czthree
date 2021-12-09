@@ -128,7 +128,7 @@ func (r repository) GetUsersWithLimitOffset(ctx context.Context, limit, offset i
 		// Where(dbx.HashExp{"active": 0}).
 		Offset(offset).
 		Limit(limit).
-		OrderBy("lastlogin").
+		OrderBy("name").
 		All(&items)
 	return items, err
 }

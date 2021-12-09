@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<title>czthree - Тодо лист</title>
+<title>czthree - Пользователи</title>
 <meta charset="utf-8"><meta name="theme-color" content="#317EFB"/>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="keywords" content="todo list doit">
@@ -128,7 +128,7 @@ aside .links a.button {
 <table class="primary">
   <thead>
     <tr>
-      <th>дата</th>
+      <th>id</th>
       <th>имя</th>
       <th>email</th>
       <th>группа</th>
@@ -137,10 +137,10 @@ aside .links a.button {
   <tbody>
     {{ range .users }}
     <tr>
-      <td>{{ if eq .Lastlogin "0001-01-01T00:00:00Z" }}гость{{ else }}{{ .Lastlogin }}{{ end }}</td>
+      <td>{{ .UserId }}</td>
       <td>{{ .Name }}</td>
       <td>{{ .Email }}</td>
-      <td>{{ .Roles }}</td>
+      <td>{{ .Role }}</td>
     </tr>
     {{ end }}
 <!--     <tr>

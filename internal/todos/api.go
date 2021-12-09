@@ -45,8 +45,9 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
             return c.Status(403).Redirect("/error.html?msg=Используйте страницу входа")
         }
         // Cookie with any jwt string
-        tokdata, _, errtok := util.GetJwtClaimHMAC(tryjwt, config.CFG.AppSecretKey)
-        if errtok != nil {   
+        tokdata, _, err := util.GetJwtClaimHMAC(tryjwt, config.CFG.AppSecretKey)
+        if err != nil {
+            println("AUTH:err:", err.Error())
             return c.Status(403).Redirect("/error.html?msg=Ошибка авторизации")
 
         }
@@ -136,6 +137,9 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
     }))
     
 	router.Get("/", MWuserinfo, MWcsp, res.pageIndex)
+    // GET  /error.html?m=You%20will%20signup%20firstly
+    router.Get("/error.html", MWuserinfo, MWheader, MWcsp, res.pageError)
+    
 // RATELIMITED PAGES:
     authGroup := router.Group("/auth", MWRateLim, MWuserinfo, MWcsp)
 

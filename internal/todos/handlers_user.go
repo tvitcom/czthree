@@ -122,7 +122,7 @@ func (res resource) pageUserTodo(c *fiber.Ctx) error {
     //     return c.Status(500).Redirect("/error.html?msg=Ошибка работы сайта")
     // }
 
-    return c.Render("todolist", fiber.Map{
+    return c.Render("usertodolist", fiber.Map{
         "msg": "userTodo page: page: Coming soon!",
         // "Tododisplay": Tododisplay,
         "user": curruser,

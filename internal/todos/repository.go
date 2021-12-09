@@ -40,7 +40,7 @@ type Repository interface {
 	// Create saves a new user in the storage.
 	CreateUser(ctx context.Context, user entity.User) (int64, error)
 	// Update user in the storage.
-	// UpdateTodo(ctx context.Context, td entity.Todo, uid int64) error
+	UpdateTodo(ctx context.Context, td entity.Todo, uid int64) error
 	// Update user in the storage.
 	UpdateTodoStatus(ctx context.Context, td entity.Todo) error
 	// Update user in the storage.
@@ -112,7 +112,7 @@ func (r repository) CreateTodo(ctx context.Context, Todo entity.Todo) (int64, er
 // return Todo records in the database.
 func (r repository) GetTodoDisplayByUserId(ctx context.Context, uid int64) ([]dto.TodoDisplay, error) {
 	var Todos []dto.TodoDisplay
-	sql := `SELECT t.todo_id, u.name manager, t.perfomer_id, t.name, t.status FROM todo t, user u WHERE t.perfomer_id = u.user_id AND t.perfomer_id = {:uid} ORDER BY t.status ASC`
+	sql := `SELECT t.todo_id, t.author_id, u.name manager, t.perfomer_id, t.name, t.status FROM todo t, user u WHERE t.perfomer_id = u.user_id AND t.perfomer_id = {:uid} ORDER BY t.status ASC`
 	err := r.db.With(ctx).NewQuery(sql).Bind(dbx.Params{"uid": uid}).All(&Todos)
 	return Todos, err
 }
@@ -144,25 +144,25 @@ func (r repository) UpdateTodoStatus(ctx context.Context, td entity.Todo) error 
 }
 
 // Update saves the changes to an user in the database.
-// func (r repository) UpdateTodo(ctx context.Context, td entity.Todo, uid int64) error {
-// 	dbxvar := dbx.Params{
-// 			"status": td.Status,
-// 		}
-// 	if td.Name != "" {
-// 		dbxvar["name"] = td.Name
-// 	}
-// 	if td.PerfomerId != 0 {
-// 		dbxvar["perfomer_id"] = td.PerfomerId
-// 	}
-// 	if td.PerfomerId != 0 {
-// 		dbxvar["creator_id"] = td.PerfomerId
-// 	}
-// 	// UPDATE `users` SET `status`={:p0} WHERE `id`={:p1}
-// 	_, err := r.db.With(ctx).Update("todo", dbxvar, dbx.HashExp{
-// 		"todo_id": td.TodoId,
-// 	}).Execute()
-// 	return err
-// }
+func (r repository) UpdateTodo(ctx context.Context, td entity.Todo, uid int64) error {
+	dbxvar := dbx.Params{
+			"status": td.Status,
+		}
+	if td.Name != "" {
+		dbxvar["name"] = td.Name
+	}
+	if td.PerfomerId != 0 {
+		dbxvar["perfomer_id"] = td.PerfomerId
+	}
+	if td.PerfomerId != 0 {
+		dbxvar["creator_id"] = td.PerfomerId
+	}
+	// UPDATE `users` SET `status`={:p0} WHERE `id`={:p1}
+	_, err := r.db.With(ctx).Update("todo", dbxvar, dbx.HashExp{
+		"todo_id": td.TodoId,
+	}).Execute()
+	return err
+}
 
 
 // Update saves the changes to an user in the database.

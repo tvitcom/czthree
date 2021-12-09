@@ -121,9 +121,8 @@ aside .links a.button {
         </div>
         <a href="#home" tabindex="-1" class="top pseudo button visible">▲ Наверх ▲</a>
       </aside>
-      <article class="full four-fifth-1000">
-        
 
+<article class="full four-fifth-1000">
 <h2 id="tabs">Пользователи</h2>
 <table class="primary">
   <thead>
@@ -132,6 +131,7 @@ aside .links a.button {
       <th>имя</th>
       <th>email</th>
       <th>группа</th>
+      <th>действия</th>
     </tr>
   </thead>
   <tbody>
@@ -141,32 +141,9 @@ aside .links a.button {
       <td>{{ .Name }}</td>
       <td>{{ .Email }}</td>
       <td>{{ .Role }}</td>
+      <td><a href="/my/todolist.html?uid={{ .UserId }}">дела</a></td>
     </tr>
     {{ end }}
-<!--     <tr>
-      <td>Francisco</td>
-      <td>Francisco</td>
-      <td>Valencia, Spain</td>
-      <td>23</td>
-    </tr>
-    <tr>
-      <td>Eve</td>
-      <td>23 июля</td>
-      <td>San Francisco, USA</td>
-      <td>22</td>
-    </tr>
-    <tr>
-      <td>Martin</td>
-      <td>Martin</td>
-      <td>New York, USA</td>
-      <td>45</td>
-    </tr>
-    <tr>
-      <td>Sarah</td>
-      <td>Sarah</td>
-      <td>London, UK</td>
-      <td>25</td>
-    </tr> -->
   </tbody>
 </table>
 

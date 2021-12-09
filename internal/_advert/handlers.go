@@ -19,7 +19,7 @@ func (res resource) pageIndex(c *fiber.Ctx) error {
         form.Clause = searchclause
         // Form validation    
         if err := form.Validate(); err != nil {
-            return c.Status(412).Render("error", fiber.Map{"msg": err})
+            return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
         }
         res, err := res.agregator.GetTodoSearch(c.UserContext(), form.Clause)
         if err != nil {
@@ -183,11 +183,11 @@ func (res resource) handlerPublication(c *fiber.Ctx) error {
     form := new(QuickTodoForm) 
     if err := c.BodyParser(form); err != nil {
         res.logger.With(c.UserContext()).Error(err.Error())
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
     // Form validation    
     if err := form.Validate(); err != nil {
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
     // Get the UserId from db or make new:
     var user User
@@ -245,7 +245,7 @@ func (res resource) handlerPublication(c *fiber.Ctx) error {
                 
                 if err := c.SaveFile(ff, config.PictureTodoPath + imagerawfname); err != nil {
                     return c.Status(500).Render("error", fiber.Map{
-                        "msg": err,
+                        "msg": err.Error(),
                     })
                 }
                 if err := util.ImagefileValidations(config.PictureTodoPath + imagerawfname); err != nil {
@@ -347,10 +347,10 @@ func (res resource) handlerMessage(c *fiber.Ctx) error {
     form := new(MessageForm) 
     if err := c.BodyParser(form); err != nil {
         res.logger.With(c.UserContext()).Info(err)
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
     if err := form.Validate(); err != nil {
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
 
     // Get the UserId from db or make new:
@@ -416,12 +416,12 @@ func (res resource) handlerSupport(c *fiber.Ctx) error {
     form := new(SupportForm) 
     if err := c.BodyParser(form); err != nil {
         res.logger.With(c.UserContext()).Info(err)
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
 
     // Form validation    
     if err := form.Validate(); err != nil {
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
 
     // Get the UserId from db or make new:
@@ -478,7 +478,7 @@ func (res resource) handlerSupport(c *fiber.Ctx) error {
                 userpicfpath, err := util.MakeUploadDirByUserId(config.PictureSupportPath, util.Stringer(user.UserId))
                 if err != nil {
                     return c.Status(501).Render("error", fiber.Map{
-                        "msg": err,
+                        "msg": err.Error(),
                     })
                 }
                 imagerawfname := imagepartialfname + "_raw_" + v +".jpg"
@@ -486,7 +486,7 @@ func (res resource) handlerSupport(c *fiber.Ctx) error {
                 
                 if err := c.SaveFile(ff, userpicfpath + imagerawfname); err != nil {
                     return c.Status(500).Render("error", fiber.Map{
-                        "msg": err,
+                        "msg": err.Error(),
                     })
                 }
 

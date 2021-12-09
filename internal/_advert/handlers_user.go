@@ -26,14 +26,14 @@ func (res resource) handlerUserProfile(c *fiber.Ctx) error {
     uid := util.Pkeyer(c.Locals("iam"))
     curruser, err := res.agregator.GetUserById(c.UserContext(), uid)
     if err != nil {
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
 
     form := new(ProfileForm)
     if err := c.BodyParser(form); err != nil {
         res.logger.With(c.UserContext()).Error(err.Error())
         return c.Status(412).Render("error", fiber.Map{
-            "msg": err,
+            "msg": err.Error(),
             "user": curruser,
         })
     }
@@ -41,7 +41,7 @@ func (res resource) handlerUserProfile(c *fiber.Ctx) error {
     form.Tel = util.PhoneNormalisation(form.Tel)   
     // Form validation    
     if err := form.Validate(); err != nil {
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
 
     // Parse the multipart form:
@@ -59,14 +59,14 @@ func (res resource) handlerUserProfile(c *fiber.Ctx) error {
             fmt.Println("TO pictureMultypartFile:", err)
             if err != nil {
                 return c.Status(501).Render("error", fiber.Map{
-                    "msg": err,
+                    "msg": err.Error(),
                 })
             }
             imagefname = util.GetMD5Hash(fmt.Sprintf("%s", time.Now().UnixNano()))+".jpg"
             err = c.SaveFile(ff, config.UploadedPath + imagefname)
             if err != nil {
                 return c.Status(500).Render("error", fiber.Map{
-                    "msg": err,
+                    "msg": err.Error(),
                 })
             }
             err = util.ImagefileValidations(config.UploadedPath + imagefname)
@@ -106,7 +106,7 @@ func (res resource) handlerUserProfile(c *fiber.Ctx) error {
 
     err = res.agregator.UpdateUser(c.UserContext(), form, uid, imagefname)
     if err != nil {
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
     return c.Redirect("/my/userprofile.html")
 }
@@ -115,7 +115,7 @@ func (res resource) pageUserTodo(c *fiber.Ctx) error {
     uid := util.Pkeyer(c.Locals("iam"))
     curruser, err := res.agregator.GetUserById(c.UserContext(), uid)
     if err != nil {
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
     Tododisplay, err := res.agregator.GetTodoDisplayByUserId(c.UserContext(), uid)
     if err != nil {
@@ -148,11 +148,11 @@ func (res resource) pageUserMessages(c *fiber.Ctx) error {
     uid := util.Pkeyer(c.Locals("iam"))
     curruser, err := res.agregator.GetUserById(c.UserContext(), uid)
     if err != nil {
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
     senders, err := res.agregator.GetMessagesSendersByUserId(c.UserContext(), uid)
     if err != nil {
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
     return c.Render("usermessages", fiber.Map{
         "msg": "usermessages page: page: Coming soon!",
@@ -168,11 +168,11 @@ func (res resource) pageUserList(c *fiber.Ctx) error {
     }
     curruser, err := res.agregator.GetUserById(c.UserContext(), uid)
     if err != nil {
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
     users, err := res.agregator.GetUsersWithLimitOffset(c.UserContext(), 1000, 0)
     if err != nil {
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
     return c.Render("userlist", fiber.Map{
         "msg": "userlist page: page: Coming soon!",

@@ -31,7 +31,7 @@ func (res resource) handlerLogin(c *fiber.Ctx) error {
     form := new(LoginForm)
     if err := c.BodyParser(form); err != nil {
         res.logger.With(c.UserContext()).Error(err.Error())
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
     // validation    
     if err := form.Validate(); err != nil {
@@ -61,7 +61,7 @@ func (res resource) handlerLogin(c *fiber.Ctx) error {
     rnd32 := util.RandomHexString(8)
     tok, err := util.MakeJwtString(config.CFG.AppSecretKey, rnd32, config.CFG.AppFqdn, util.Stringer(user.UserId), "main", "user")
     if err != nil {
-        return c.Status(403).Render("error", fiber.Map{"msg": err})
+        return c.Status(403).Render("error", fiber.Map{"msg": err.Error()})
     }
     makeJWTCookie(c, tok)
     return c.Redirect("/my/userTodo.html", 301)
@@ -84,21 +84,21 @@ func (res resource) handlerSignup(c *fiber.Ctx) error {
     form := new(SignupForm)
     if err := c.BodyParser(form); err != nil {
         res.logger.With(c.UserContext()).Error(err.Error())
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
 
     fmt.Println("FORM:", form, fmt.Sprintf("%s", time.Now().UnixNano()))
      
     // validation    
     if err := form.Validate(); err != nil {
-        return c.Status(412).Render("error", fiber.Map{"msg": err})
+        return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
 
     userfilename := ""
     pictureFile, err := c.FormFile("picture")
     if err != nil {
         return c.Status(412).Render("error", fiber.Map{
-            "msg": err,
+            "msg": err.Error(),
         })
     }
 
@@ -129,13 +129,13 @@ func (res resource) handlerSignup(c *fiber.Ctx) error {
         file, err := os.Open(fname)
         if err != nil {
             return c.Status(500).Render("error", fiber.Map{
-                "msg": err,
+                "msg": err.Error(),
             })
         }
         img, err := jpeg.Decode(file)
         if err != nil {
             return c.Status(500).Render("error", fiber.Map{
-                "msg": err,
+                "msg": err.Error(),
             })
         }
         file.Close()
@@ -145,7 +145,7 @@ func (res resource) handlerSignup(c *fiber.Ctx) error {
         out, err := os.Create(resizedfile)
         if err != nil {
             return c.Status(500).Render("error", fiber.Map{
-                "msg": err,
+                "msg": err.Error(),
             })
         }
         defer out.Close()

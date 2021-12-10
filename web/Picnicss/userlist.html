@@ -186,19 +186,7 @@ u('aside a').on('click', function(e){
 u([window]).on('scroll', function(){
   var top = this.scrollY || document.documentElement.scrollTop;
   u('.top').toggleClass('visible', top > 1000);
-}).trigger('scroll');</script><script>window.onload = function(){
-
-  // Dropimage handler
-  [].forEach.call(document.querySelectorAll('.dropimage'), function(img){
-    img.onchange = function(e){
-      var inputfile = this, reader = new FileReader();
-      reader.onloadend = function(){
-        inputfile.style['background-image'] = 'url('+reader.result+')';
-        }
-      reader.readAsDataURL(e.target.files[0]);
-      }
-    });
-  };
+}).trigger('scroll');</script>
 </script>
 </body>
 </html>

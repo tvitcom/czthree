@@ -135,9 +135,23 @@ aside .links a.button {
 <input type="hidden" name="author_id" value="{{.todo.AuthorId}}">
 <fieldset class="flex three-600 one-400">
   <label><input type="name" placeholder="Имя" name="name" value="{{ .todo.Name }}" autofocus="autofocus" minlength="2" maxlength="128" required="required"></label>
-  <label>
-    <input type="text" name="perfomer_id" value="{{.todo.PerfomerId}}" placeholder="Исполнитель"></label>
-  <label><input type="text" name="status" value="{{.todo.Status}}" placeholder="Состояние"></label>
+  <label><select title="Выбирайте на кого закрепить задачу" name="perfomer_id">
+              <option>Выбрать...</option>
+              {{ $CurrAuthorId := .todo.AuthorId}}
+              {{ range .users }}
+              <option value="{{ .UserId }}" {{ if eq $CurrAuthorId .UserId }} selected="selected" {{end}}>{{ .Name }}</option>
+              {{ else }}
+              <option value="" disable>Ошибка загрузки пользователей</option>
+              {{ end }}
+            </select></label>
+  <!-- <label><  name="status" value="{{.todo.Status}}" placeholder="Состояние"></label> -->
+              {{ $CurrStatus := .todo.Status}}
+    <label><select title="Состояние задачи" name="status">
+              <option>Выбрать...</option>
+              <option value="2" {{ if eq $CurrStatus 2 }} selected="selected" {{end}}>Выполнено</option>
+              <option value="1" {{ if eq $CurrStatus 1 }} selected="selected" {{end}}>Не выполнено</option>
+              <option value="0" {{ if eq $CurrStatus 0 }} selected="selected" {{end}}>Не применяется</option>
+            </select></label>
 </fieldset>
 <!-- <fieldset class="flex two-600 one-400">
   <label>

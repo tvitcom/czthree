@@ -234,11 +234,12 @@ func (ag agregator) GetUsersWithLimitOffset(ctx context.Context, limit, offset i
 	if err != nil {
 		return nil, err
 	}
-	result := []entity.User{}
-	for _, item := range items {
-		result = append(result, item)
-	}
-	return result, nil
+	// result := []entity.User{}
+	// for _, item := range items {
+	// 	result = append(result, item)
+	// }
+	// return result, nil
+	return items, nil
 }
 
 func (ag agregator) GetTodoByUserId(ctx context.Context, uid int64) ([]entity.Todo, error) {

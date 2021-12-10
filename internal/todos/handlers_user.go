@@ -115,9 +115,11 @@ func (res resource) pageUpdateTodo(c *fiber.Ctx) error {
     if err != nil {
         return c.Status(412).Render("error", fiber.Map{"msg": err.Error()})
     }
+    users, err := res.agregator.GetUsersWithLimitOffset(c.UserContext(), 100, 0)
     return c.Status(200).Render("usertodoform", fiber.Map{
         "todo": todo,
         "user": curruser,
+        "users": users,
     })
 }
 

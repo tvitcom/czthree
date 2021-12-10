@@ -1,6 +1,7 @@
-package Todo
+package todos
 
 import (
+	"fmt"
 	"context"
 	"github.com/tvitcom/czthree/internal/entity"
 	"github.com/tvitcom/czthree/internal/dto"
@@ -40,7 +41,7 @@ type Repository interface {
 	// Create saves a new user in the storage.
 	CreateUser(ctx context.Context, user entity.User) (int64, error)
 	// Update user in the storage.
-	UpdateTodo(ctx context.Context, td entity.Todo, uid int64) error
+	UpdateTodo(ctx context.Context, td entity.Todo) error
 	// Update user in the storage.
 	UpdateTodoStatus(ctx context.Context, td entity.Todo) error
 	// Update user in the storage.
@@ -62,9 +63,13 @@ func NewRepository(db *dbcontext.DB, logger log.Logger) Repository {
 
 // Get the Todo with the specified ID from the database.
 func (r repository) GetTodoById(ctx context.Context, id int64) (entity.Todo, error) {
-	var Todo entity.Todo
-	err := r.db.With(ctx).Select().Model(id, &Todo)
-	return Todo, err
+	var todo entity.Todo
+	// err := r.db.With(ctx).Select().Model(id, &Todo)
+	// err := r.db.With(ctx).Select().From("todo").Where(dbx.HashExp{"todo_id": id}).One(&todo)
+	sql := `select t.* from todo t where t.todo_id={:id}`
+	err := r.db.With(ctx).NewQuery(sql).Bind(dbx.Params{"id": id}).One(&todo)
+fmt.Printf("REPO-TODO:" , todo)
+	return todo, err
 }
 
 // Get the user with the specified ID from the database.
@@ -77,7 +82,7 @@ func (r repository) GetUserById(ctx context.Context, id int64) (entity.User, err
 // Get the user with the specified Todo_ID from the database.
 func (r repository) GetUserByTodoId(ctx context.Context, aid int64) (entity.User, error) {
 	var user entity.User
-	sql := `select u.* from user u left join Todo a on u.user_id=a.user_id where a.Todo_id={:aid}`
+	sql := `select u.* from user u left join Todo a on u.user_id=a.user_id where a.todo_id={:aid}`
 	err := r.db.With(ctx).NewQuery(sql).Bind(dbx.Params{"aid": aid}).One(&user)
 	return user, err
 }
@@ -144,18 +149,18 @@ func (r repository) UpdateTodoStatus(ctx context.Context, td entity.Todo) error 
 }
 
 // Update saves the changes to an user in the database.
-func (r repository) UpdateTodo(ctx context.Context, td entity.Todo, uid int64) error {
+func (r repository) UpdateTodo(ctx context.Context, td entity.Todo) error {
 	dbxvar := dbx.Params{
 			"status": td.Status,
 		}
-	if td.Name != "" {
-		dbxvar["name"] = td.Name
-	}
 	if td.PerfomerId != 0 {
 		dbxvar["perfomer_id"] = td.PerfomerId
 	}
 	if td.PerfomerId != 0 {
-		dbxvar["creator_id"] = td.PerfomerId
+		dbxvar["author_id"] = td.PerfomerId
+	}
+	if td.Name != "" {
+		dbxvar["name"] = td.Name
 	}
 	// UPDATE `users` SET `status`={:p0} WHERE `id`={:p1}
 	_, err := r.db.With(ctx).Update("todo", dbxvar, dbx.HashExp{
@@ -163,7 +168,6 @@ func (r repository) UpdateTodo(ctx context.Context, td entity.Todo, uid int64) e
 	}).Execute()
 	return err
 }
-
 
 // Update saves the changes to an user in the database.
 func (r repository) UpdateUser(ctx context.Context, user entity.User, uid int64) error {
@@ -187,7 +191,7 @@ func (r repository) Update(ctx context.Context, Todo entity.Todo) error {
 
 // Delete deletes an Todo with the specified ID from the database.
 func (r repository) DeleteTodoById(ctx context.Context, id int64) error {
-	_, err := r.db.With(ctx).Delete("Todo", dbx.HashExp{"Todo_id": id}).Execute()
+	_, err := r.db.With(ctx).Delete("Todo", dbx.HashExp{"todo_id": id}).Execute()
 	return err
 }
 

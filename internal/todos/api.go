@@ -1,4 +1,4 @@
-package Todo
+package todos
 
 import (
     "time"
@@ -23,17 +23,6 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
 	res := resource{agregator, logger}
     MWheader := func(c *fiber.Ctx) error {
         c.Append("Powered-by", config.CFG.WebservName)
-        
-        // if config.CFG.AppMode != "dev" {
-        //    c.Append("Strict-Transport-Security", "max-age=7776000; includeSubDomains")
-        //    c.Set("X-XSS-Protection", "1; mode=block")
-        //    c.Set("X-Content-Type-Options", "nosniff")
-        //    c.Set("X-Download-Options", "noopen")
-        //    c.Set("Strict-Transport-Security", "max-age=5184000")
-        //    c.Set("X-Frame-Options", "SAMEORIGIN")
-        //    c.Set("X-DNS-Prefetch-Control", "off")
-        // }
-          // Set some security headers:
         return c.Next()
     }
     
@@ -162,9 +151,9 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
     myGroup.Post("/todochange.html", res.handlerUpdateTodoStatus)
 
 // GET /my/todoedit.html?todoid=123
-    myGroup.Get("/my/todoedit.html", res.pageUpdateTodo)
+    myGroup.Get("/todoedit.html", res.pageUpdateTodo)
 // POST /my/todoedit.html?todoid=123
-    myGroup.Post("/my/todoedit.html", res.handlerUpdateTodo)
+    myGroup.Post("/todoedit.html", res.handlerUpdateTodo)
 // POST /my/tododelete.html&tid=123
     // myGroup.Post("/tododelete.html", res.handlerDeleteTodo)
 

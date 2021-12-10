@@ -6,9 +6,9 @@ import (
 
 // Todo represents an album record.
 type Todo struct {
-  TodoId    int64  `db:"pk,Todo_id"`
-  AuthorId      int64  `db:"user_id"`
-  PerfomerId  int64  `db:"category_id"`
-  Name       string  `db:"title"`
+  TodoId    int64  `db:"pk,todo_id"`
+  AuthorId      int64  `db:"author_id"`
+  PerfomerId  int64  `db:"perfomer_id"`
+  Name       string  `db:"name"`
   Status      int     `db:"status"`
 }

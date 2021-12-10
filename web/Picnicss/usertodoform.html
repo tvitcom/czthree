@@ -121,7 +121,7 @@ aside .links a.button {
       <article class="full four-fifth-1000">
 
 <div class="visual">
-<h3 id="positions">Дело {{ .todo.Name }}</h3>
+<h3 id="positions">Дело {{ .todo.TodoId }}</h3>
 <style>
   .miniprofile {
   border-radius: 50%;    /* Make it a circle */
@@ -131,9 +131,12 @@ aside .links a.button {
 }
 </style>
 <form id="todoedit" method="post" enctype="multipart/form-data" action="/my/todoedit.html" target="_self">
+<input type="hidden" name="todo_id" value="{{.todo.TodoId}}">
+<input type="hidden" name="author_id" value="{{.todo.AuthorId}}">
 <fieldset class="flex three-600 one-400">
   <label><input type="name" placeholder="Имя" name="name" value="{{ .todo.Name }}" autofocus="autofocus" minlength="2" maxlength="128" required="required"></label>
-  <label><input type="text" name="perfomer_id" value="{{.user.PerfomerId}}" placeholder="Исполнитель"></label>
+  <label>
+    <input type="text" name="perfomer_id" value="{{.todo.PerfomerId}}" placeholder="Исполнитель"></label>
   <label><input type="text" name="status" value="{{.todo.Status}}" placeholder="Состояние"></label>
 </fieldset>
 <!-- <fieldset class="flex two-600 one-400">

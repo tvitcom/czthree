@@ -6,7 +6,7 @@ type User struct {
   Name         string  `db:"name"`
   Email        string  `db:"email"`
   Passhash     string  `db:"passhash"`
-  Role         string  `db:"role"`
+  Role         int  `db:"role"`
 }
 
 // GetID returns the user ID.

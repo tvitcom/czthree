@@ -144,7 +144,7 @@ func mountDinamicRouters(router *fiber.App, logger logz.Logger, db *dbcontext.DB
 	
 	healthcheck.RegisterHandlers(router, Version)
 	
-	Todo.RegisterHandlers(router, Todo.NewAgregator(Todo.NewRepository(db, logger), logger), logger)
+	todos.RegisterHandlers(router, todos.NewAgregator(todos.NewRepository(db, logger), logger), logger)
 }
 
 // logDBQuery returns a logging function that can be used to log SQL queries.

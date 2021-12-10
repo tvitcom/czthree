@@ -1,4 +1,4 @@
-package Todo
+package todos
 
 import (
     "time"

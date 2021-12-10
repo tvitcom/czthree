@@ -110,7 +110,7 @@ aside .links a.button {
         <h2>Разделы</h2>
         <div class="links flex two three-500 five-800 one-1000">
           <div>
-            <a class="pseudo button" href="/my/userTodo.html"><b>Дела</b></a>
+            <a class="pseudo button" href="/my/todolist.html"><b>Дела</b></a>
           </div>
           {{if eq .user.UserId 1 }}
           <div>
@@ -137,19 +137,21 @@ aside .links a.button {
     </tr>
   </thead>
   <tbody>
-    {{ range .TodoDisplay }}
+    {{$UID := .user.UserId}}
+    {{ range .todosDisplay }}
     <tr>
-      <td><a href="/my/todoview.html?todoid={{ .TodoId }}" title="Открыть" target="_self">{{ .TodoId }}</a></td>
+      <td><a href="/my/todoedit.html?todoid={{ .TodoId }}" title="Открыть" target="_self">{{ .TodoId }}</a></td>
       <td>{{ .Name }}</td>
       <td>{{ if eq .Status 1 }} задано {{else}} <font color=green>готово</font> {{end}}</td>
-      <td>{{ if ne .PerfomerId 1 }}
-        <button form="todochange" formaction="/my/todochange.html?todoid={{ .TodoId }}" value="2" name="status" {{ if eq .Status 2 }} disabled="on" {{end}}>Завершить</button>
-        {{else}}
+      <td>
+          {{if eq $UID 1 }}
         <a href="/my/todoedit.html?todoid={{ .TodoId }}">Изменить</a>
-        {{end}}
+          {{else}}
+        <button form="todochange" formaction="/my/todochange.html?todoid={{ .TodoId }}" value="2" name="status" {{ if eq .Status 2 }} disabled="on" {{end}}>Завершить</button>
+          {{end}}
       </td>
-    </tr>
     {{ end }}
+    </tr>
   </tbody>
 </table>
 

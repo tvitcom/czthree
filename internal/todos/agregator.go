@@ -1,4 +1,4 @@
-package Todo
+package todos
 
 import (
 	"context"
@@ -16,17 +16,17 @@ import (
 
 // Agregator encapsulates usecase logic for albums
 type Agregator interface {
-	GetUsersWithLimitOffset(ctx context.Context, limit, offset int64) ([]User, error)
-	GetUserById(ctx context.Context, id int64) (User, error)
-	GetUserByTodoId(ctx context.Context, aid int64) (User, error)
-	GetUserByEmail(ctx context.Context, email string) (User, error)
-	GetTodoById(ctx context.Context, id int64) (Todo, error)
-	GetTodoDisplayByUserId(ctx context.Context, uid int64) ([]TodoDisplay, error)
-	GetTodoByUserId(ctx context.Context, uid int64) ([]Todo, error)
+	GetUsersWithLimitOffset(ctx context.Context, limit, offset int64) ([]entity.User, error)
+	GetUserById(ctx context.Context, id int64) (entity.User, error)
+	GetUserByTodoId(ctx context.Context, aid int64) (entity.User, error)
+	GetUserByEmail(ctx context.Context, email string) (entity.User, error)
+	GetTodoById(ctx context.Context, id int64) (entity.Todo, error)
+	GetTodoDisplayByUserId(ctx context.Context, uid int64) ([]dto.TodoDisplay, error)
+	GetTodoByUserId(ctx context.Context, uid int64) ([]entity.Todo, error)
 	UpdateTodoStatus(ctx context.Context, fdata *TodoStatusForm, uid int64) error
-	UpdateTodo(ctx context.Context, fdata *TodoForm, uid int64) error
+	UpdateTodo(ctx context.Context, fdata *TodoForm) error
 	DeleteTodoData(ctx context.Context, aid int64) error
-	UpdateUser(ctx context.Context, fdata *ProfileForm,uid int64, avafile string) error
+	UpdateUser(ctx context.Context, fdata *ProfileForm,uid int64) error
 	CreateTodo(ctx context.Context, f *TodoForm, uid, perfid int64, dt string) (int64, error)
 }
 
@@ -35,18 +35,18 @@ type agregator struct {
 	logger log.Logger
 }
 
-type Todo struct {
-	entity.Todo
-}
-type User struct {
-	entity.User
-}
-type TodoDisplay struct {
-	dto.TodoDisplay
-}
+// type Todo struct {
+// 	entity.Todo
+// }
+// type User struct {
+// 	entity.User
+// }
+// type TodoDisplay struct {
+// 	dto.TodoDisplay
+// }
 
 type TodoForm struct {
-  TodoId    int64  `json:"author_id" form:"author_id"`
+  TodoId    int64  `json:"todo_id" form:"todo_id"`
   AuthorId    int64  `json:"author_id" form:"author_id"`
   PerfomerId  int64  `json:"perfomer_id" form:"perfomer_id"`
   Name   			string `json:"name" form:"name"`
@@ -56,9 +56,10 @@ type TodoForm struct {
 // Validate validates the TodoForm fields
 func (m TodoForm) Validate() error {
 	return vld.ValidateStruct(&m,
-		vld.Field(&m.AuthorId, vld.Required, vld.Length(2, 128), vld.Match(regexp.MustCompile(`^(([a-zA-Z' -]{2,128})|([а-яА-ЯЁёІіЇїҐґЄє' -]{2,128}))`))),
+		vld.Field(&m.TodoId, vld.Required),
+		vld.Field(&m.AuthorId, vld.Required),
 		vld.Field(&m.PerfomerId, vld.Required),//, is.Digit),
-		vld.Field(&m.Name, vld.Required),//, is.Digit),
+		vld.Field(&m.Name, vld.Required, vld.Length(2, 128)),//, is.Digit),
 		vld.Field(&m.Status, vld.Required),//, is.Digit),
 		)
 }
@@ -82,7 +83,7 @@ type ProfileForm struct {
 }
 
 type DeleteTodoForm struct {
-  TodoId int64  `json:"Todo_id" form:"Todo_id"`
+  TodoId int64  `json:"todo_id" form:"todo_id"`
 }
 
 // Validate validates the LoginForm fields
@@ -102,14 +103,14 @@ func (f TodoStatusForm) Validate() error {
 }
 
 // Validate validates the ProfileForm fields
-// func (m ProfileForm) Validate() error {
-// 	return vld.ValidateStruct(&m,
-// 		vld.Field(&m.Tel, vld.When(m.Tel != "", vld.Required, vld.Length(10, 21), vld.Match(regexp.MustCompile(`[\d\s\-\+\(\)]{10,21}`))).Else(vld.Nil)),
-// 		vld.Field(&m.GivenName, vld.Required, vld.Length(2, 64), vld.Match(regexp.MustCompile(`^(([a-zA-Z' -]{2,128})|([а-яА-ЯЁёІіЇїҐґЄє' -]{2,128}))`))),
-// 		vld.Field(&m.NewPassword, vld.When(m.NewPassword != "", vld.Length(6, 128), vld.Required)),
-// 		vld.Field(&m.NewPasswordRepeat, vld.When(m.NewPassword != "", vld.By(passwordsEquals(m.NewPassword)))),
-// 	)
-// }
+func (m ProfileForm) Validate() error {
+	return vld.ValidateStruct(&m,
+		// vld.Field(&m.Tel, vld.When(m.Tel != "", vld.Required, vld.Length(10, 21), vld.Match(regexp.MustCompile(`[\d\s\-\+\(\)]{10,21}`))).Else(vld.Nil)),
+		vld.Field(&m.GivenName, vld.Required, vld.Length(2, 64), vld.Match(regexp.MustCompile(`^(([a-zA-Z' -]{2,128})|([а-яА-ЯЁёІіЇїҐґЄє' -]{2,128}))`))),
+		vld.Field(&m.NewPassword, vld.When(m.NewPassword != "", vld.Length(6, 128), vld.Required)),
+		vld.Field(&m.NewPasswordRepeat, vld.When(m.NewPassword != "", vld.By(passwordsEquals(m.NewPassword)))),
+	)
+}
 
 func passwordsEquals(str string) vld.RuleFunc {
 	return func(value interface{}) error {
@@ -145,26 +146,19 @@ func (ag agregator) UpdateTodoStatus(ctx context.Context, tdf *TodoStatusForm, u
 }
 
 // Update sattus in todo.
-func (ag agregator) UpdateTodo(ctx context.Context, tdf *TodoForm, uid int64) error {
-	var newstatus int
-	if uid != config.AdminUserID && tdf.Status == config.TODO_DONE { // status == 2
-		newstatus = config.TODO_DONE
-	} else if uid == config.AdminUserID {
-		newstatus = tdf.Status
-	} else {
-		return errors.New("Bad user credential for operation")
-	}
+func (ag agregator) UpdateTodo(ctx context.Context, tdf *TodoForm) error {
 	return ag.repo.UpdateTodo(ctx, 
 		entity.Todo{
 	    TodoId: tdf.TodoId,
-	    Status: newstatus,
-		}, 
-		uid,
-	)
+	    AuthorId: tdf.AuthorId,
+	    PerfomerId: tdf.PerfomerId,
+	    Name: tdf.Name,
+	    Status: tdf.Status,
+		})
 }
 
 // Update user.
-func (ag agregator) UpdateUser(ctx context.Context, pf *ProfileForm, uid int64, avafile string) error {
+func (ag agregator) UpdateUser(ctx context.Context, pf *ProfileForm, uid int64) error {
   // Save new User record
   if pf.NewPassword != "" {
       pf.NewPassword = util.MakeBCryptHash(pf.NewPassword, config.BCRYPT_COST)
@@ -175,85 +169,86 @@ func (ag agregator) UpdateUser(ctx context.Context, pf *ProfileForm, uid int64, 
 		entity.User{
 	    Name:     pf.GivenName,
 	    Passhash: pf.NewPassword,
-	    Role:     "10",
+	    Role:     config.USER_ROLE,
 		}, 
 		uid,
 	)
 }
 
-func (ag agregator) GetUserById(ctx context.Context, id int64) (User, error) {
+func (ag agregator) GetUserById(ctx context.Context, id int64) (entity.User, error) {
 	if id == 0 {
-		return User{}, nil
+		return entity.User{}, nil
 	}
 	user, err := ag.repo.GetUserById(ctx, id)
 	if err != nil {
-		return User{}, err
+		return entity.User{}, err
 	}
-	return User{user}, nil
+	return user, nil
 }
 
-func (ag agregator) GetUserByTodoId(ctx context.Context, aid int64) (User, error) {
+func (ag agregator) GetUserByTodoId(ctx context.Context, aid int64) (entity.User, error) {
 	if aid == 0 {
-		return User{}, nil
+		return entity.User{}, nil
 	}
 	user, err := ag.repo.GetUserByTodoId(ctx, aid)
 	if err != nil {
-		return User{}, err
+		return entity.User{}, err
 	}
-	return User{user}, nil
+	return user, nil
 }
 
-func (ag agregator) GetTodoById(ctx context.Context, id int64) (Todo, error) {
+func (ag agregator) GetTodoById(ctx context.Context, id int64) (entity.Todo, error) {
 	if id == 0 {
-		return Todo{}, nil
+		return entity.Todo{}, nil
 	}
 	todo, err := ag.repo.GetTodoById(ctx, id)
+fmt.Printf("AGREG-TODO: %v", todo)
 	if err != nil {
-		return Todo{}, err
+		return entity.Todo{}, err
 	}
-	return Todo{todo}, nil
+	return todo, nil
 }
 
-func (ag agregator) GetTodoDisplayByUserId(ctx context.Context, uid int64) ([]TodoDisplay, error) {
-	result := []TodoDisplay{}
+func (ag agregator) GetTodoDisplayByUserId(ctx context.Context, uid int64) ([]dto.TodoDisplay, error) {
+	result := []dto.TodoDisplay{}
 	items, err := ag.repo.GetTodoDisplayByUserId(ctx, uid)
 	if err != nil {
 		return result, err
 	}
 	for _, item := range items {
-		result = append(result, TodoDisplay{item})
+		result = append(result, item)
 	}
 	return result, nil
 }
 
-func (ag agregator) GetUserByEmail(ctx context.Context, email string) (User, error) {
+func (ag agregator) GetUserByEmail(ctx context.Context, email string) (entity.User, error) {
 	user, err := ag.repo.GetUserByEmail(ctx, email)
 	if err != nil {
-		return User{}, err
+		return entity.User{}, err
 	}
-	return User{user}, nil
+	return user, nil
 }
 
-func (ag agregator) GetUsersWithLimitOffset(ctx context.Context, limit, offset int64) ([]User, error) {
+func (ag agregator) GetUsersWithLimitOffset(ctx context.Context, limit, offset int64) ([]entity.User, error) {
 	items, err := ag.repo.GetUsersWithLimitOffset(ctx, limit, offset)
 	if err != nil {
 		return nil, err
 	}
-	result := []User{}
+	result := []entity.User{}
 	for _, item := range items {
-		result = append(result, User{item})
+		result = append(result, item)
 	}
 	return result, nil
 }
 
-func (ag agregator) GetTodoByUserId(ctx context.Context, uid int64) ([]Todo, error) {
+func (ag agregator) GetTodoByUserId(ctx context.Context, uid int64) ([]entity.Todo, error) {
 	items, err := ag.repo.GetTodoByUserId(ctx, uid)
 	if err != nil {
 		return nil, err
 	}
-	result := []Todo{}
+	result := []entity.Todo{}
 	for _, item := range items {
-		result = append(result, Todo{item})
+		result = append(result, item)
 	}
 	return result, nil
 }

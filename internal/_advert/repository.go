@@ -70,9 +70,10 @@ func NewRepository(db *dbcontext.DB, logger log.Logger) Repository {
 
 // Get the Todo with the specified ID from the database.
 func (r repository) GetTodoById(ctx context.Context, id int64) (entity.Todo, error) {
-	var Todo entity.Todo
-	err := r.db.With(ctx).Select().Model(id, &Todo)
-	return Todo, err
+	var todo entity.Todo
+	err := r.db.With(ctx).Select().From("todo").Where(dbx.HashExp{"todo_id": id}).One(&todo)
+fmt.Printf("REPO-TODO: %v", todo)
+	return todo, err
 }
 
 // Get the user with the specified ID from the database.

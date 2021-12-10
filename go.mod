@@ -54,5 +54,5 @@ require (
 	github.com/tvitcom/czthree/pkg/dbcontext v0.0.0-00010101000000-000000000000
 	github.com/tvitcom/czthree/pkg/log v0.0.0-00010101000000-000000000000
 	github.com/valyala/fastjson v1.6.3 // indirect
-	golang.org/x/crypto v0.0.0-20211202192323-5770296d904e
+	golang.org/x/crypto v0.0.0-20211209193657-4570a0811e8b
 )

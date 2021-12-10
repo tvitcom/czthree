@@ -100,9 +100,6 @@ func (res resource) handlerDeleteTodo(c *fiber.Ctx) error {
 
 func (res resource) handlerUpdateTodoStatus(c *fiber.Ctx) error {
     uid := util.Pkeyer(c.Locals("iam"))
-    if uid != config.AdminUserID {
-        return c.Status(403).Render("error", fiber.Map{"msg": "Unauthorised"})
-    }
     form := new(TodoStatusForm)
     form.TodoId = util.Pkeyer(c.Query("todoid", "0"))
     if err := c.BodyParser(form); err != nil && uid != 0 {

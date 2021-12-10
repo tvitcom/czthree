@@ -115,16 +115,13 @@ aside .links a.button {
             <a class="pseudo button" href="/my/userlist.html">Пользователи</a>
           </div>
           {{end}}
-          <div>
-            <a class="pseudo button" href="/my/userprofile.html"><b>Профиль</b></a>
-          </div>
         </div>
         <a href="#home" tabindex="-1" class="top pseudo button visible">▲ Наверх ▲</a>
       </aside>
       <article class="full four-fifth-1000">
 
 <div class="visual">
-<h3 id="positions">Профиль {{ .msg }}</h3>
+<h3 id="positions">Дело {{ .todo.Name }}</h3>
 <style>
   .miniprofile {
   border-radius: 50%;    /* Make it a circle */
@@ -133,27 +130,22 @@ aside .links a.button {
   padding-bottom: 60%;   /* 60% height */
 }
 </style>
-<form id="userprofile" method="post" enctype="multipart/form-data" action="/my/userprofile.html" target="_self">
-<div style="width: 200px;margin:40px;">
-  <label class="dropimage miniprofile" style="background-image: url(/userpic/{{ .user.UserId }}/{{ .user.Picture }})">
-    <input name="picture" title="Клик для выбора фото для загрузки (.jpeg)" type="file" accept="image/jpeg">
-  </label>
-</div>
+<form id="todoedit" method="post" enctype="multipart/form-data" action="/my/todoedit.html" target="_self">
 <fieldset class="flex three-600 one-400">
-  <label><input type="name" placeholder="Имя" name="given-name" value="{{ .user.Name }}" autofocus="autofocus" minlength="2" maxlength="64" pattern="[a-zA-Zа-яёА-ЯЁїЇіІґҐ\s\.\,\-\']{2,64}" required="required"></label>
-  <label><input type="tel" name="tel" value="{{.user.Tel}}" placeholder="Телефон" pattern="[\d\s\-\+\(\)]{10,21}" autocomplete="tel"></label>
-  <label><input form="anotherdummyform" type="email" name="email" value="{{.user.Email}}" placeholder="E-mail" disabled></label>
+  <label><input type="name" placeholder="Имя" name="name" value="{{ .todo.Name }}" autofocus="autofocus" minlength="2" maxlength="128" required="required"></label>
+  <label><input type="text" name="perfomer_id" value="{{.user.PerfomerId}}" placeholder="Исполнитель"></label>
+  <label><input type="text" name="status" value="{{.todo.Status}}" placeholder="Состояние"></label>
 </fieldset>
-<fieldset class="flex two-600 one-400">
+<!-- <fieldset class="flex two-600 one-400">
   <label>
     <input type="password" name="new-password" title="Придумайте пароль более 6 символов вида Zb&q9?va (к примеру Междунамитаетлёд в английской раскладке)" placeholder="Введите пароль если меняете его*" maxlength="128" minlength="6">
   </label>
   <label>
     <input type="password" name="new-password-repeat" title="Введите еще раз - докажите что запомнили" placeholder="Повторите пароль*" maxlength="128" minlength="6">
   </label>
-</fieldset>
+</fieldset> -->
 <button class='success' type="submit">Обновить</button>
-<a class='button warning' href="/my/userTodo.html" target="_self" title="не сохранившись перейти мои объявления">Закрыть</a>
+<a class='button warning' href="/my/todolist.html" target="_self" title="не сохранившись перейти мои дела">Закрыть</a>
 </form>
 </div>
 
@@ -196,19 +188,6 @@ u('aside a').on('click', function(e){
 u([window]).on('scroll', function(){
   var top = this.scrollY || document.documentElement.scrollTop;
   u('.top').toggleClass('visible', top > 1000);
-}).trigger('scroll');</script><script>window.onload = function(){
-
-  // Dropimage handler
-  [].forEach.call(document.querySelectorAll('.dropimage'), function(img){
-    img.onchange = function(e){
-      var inputfile = this, reader = new FileReader();
-      reader.onloadend = function(){
-        inputfile.style['background-image'] = 'url('+reader.result+')';
-        }
-      reader.readAsDataURL(e.target.files[0]);
-      }
-    });
-  };
-</script>
+}).trigger('scroll');</script>
 </body>
 </html>

@@ -72,7 +72,6 @@ func NewRepository(db *dbcontext.DB, logger log.Logger) Repository {
 func (r repository) GetTodoById(ctx context.Context, id int64) (entity.Todo, error) {
 	var todo entity.Todo
 	err := r.db.With(ctx).Select().From("todo").Where(dbx.HashExp{"todo_id": id}).One(&todo)
-fmt.Printf("REPO-TODO: %v", todo)
 	return todo, err
 }
 
@@ -188,7 +187,7 @@ func (r repository) UpdateTodoPicture(ctx context.Context, aid int64, field, fna
 	dbxvar := dbx.Params{
 			field: fname,
 		}
-	_, err := r.db.With(ctx).Update("Todo", dbxvar, dbx.HashExp{
+	_, err := r.db.With(ctx).Update("todo", dbxvar, dbx.HashExp{
 		"Todo_id": aid,
 	}).Execute()
 	return err
@@ -201,7 +200,7 @@ func (r repository) Update(ctx context.Context, Todo entity.Todo) error {
 
 // Delete deletes an Todo with the specified ID from the database.
 func (r repository) DeleteTodoById(ctx context.Context, id int64) error {
-	_, err := r.db.With(ctx).Delete("Todo", dbx.HashExp{"Todo_id": id}).Execute()
+	_, err := r.db.With(ctx).Delete("todo", dbx.HashExp{"todo_id": id}).Execute()
 	return err
 }
 

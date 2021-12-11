@@ -155,12 +155,12 @@ func RegisterHandlers(router *fiber.App, agregator Agregator, logger log.Logger)
 // POST /my/todoedit.html?todoid=123
     myGroup.Post("/todoedit.html", res.handlerUpdateTodo)
 // POST /my/tododelete.html&tid=123
-    // myGroup.Post("/tododelete.html", res.handlerDeleteTodo)
+    myGroup.Post("/tododelete.html", res.handlerDeleteTodo)
 
 // GET /my/todonew.html
-    // myGroup.Get("/todonew.html", res.pageSoon)
+     myGroup.Get("/todonew.html", res.pageCreateTodo)
 // POST /my/todonew.html
-    // myGroup.Post("/todonew.html", res.pageSoon)
+    myGroup.Post("/todonew.html", res.handlerCreateTodo)
 
 /* ---------USERS: ---------------- */
     myGroup.Get("/userlist.html", res.pageUserList)

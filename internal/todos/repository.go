@@ -191,7 +191,7 @@ func (r repository) Update(ctx context.Context, Todo entity.Todo) error {
 
 // Delete deletes an Todo with the specified ID from the database.
 func (r repository) DeleteTodoById(ctx context.Context, id int64) error {
-	_, err := r.db.With(ctx).Delete("Todo", dbx.HashExp{"todo_id": id}).Execute()
+	_, err := r.db.With(ctx).Delete("todo", dbx.HashExp{"todo_id": id}).Execute()
 	return err
 }
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<title>czthree - Профиль пользователя {{ .user.Name }}</title>
+<title>czthree - Создание задачи {{ .user.Name }}</title>
 <meta charset="utf-8"><meta name="theme-color" content="#317EFB"/>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="keywords" content="объявления, разместить, бесплатно, Харьков, Украина, купить, рубрика, категория, аренда, авто, велосипед, спорт, услуги, мастера, компьютер, мебель, ремонт">
@@ -94,7 +94,6 @@ aside .links a.button {
 </head>
 <body>
   <form id="logoutlink" method="post" enctype="multipart/form-data" action="/auth/logout.html" target="_self"></form>
-  <form id="deletetodo" method="post" enctype="multipart/form-data" action="/my/tododelete.html" target="_self"></form>
   <nav>
     <a href="/" class="brand" hreflang="ru"><span>czthree</span></a>
     <input id="bmenu" type="checkbox" class="show"><label for="bmenu" class="burger toggle pseudo button">Открыть меню</label>
@@ -119,40 +118,37 @@ aside .links a.button {
         </div>
         <a href="#home" tabindex="-1" class="top pseudo button visible">▲ Наверх ▲</a>
       </aside>
-      <article class="full four-fifth-1000">
+<article class="full four-fifth-1000">
 
 <div class="visual">
-<h3 id="positions">Дело {{ .todo.TodoId }}</h3>
+<h3 id="positions">Создать Дело</h3>
 <p>
-<form id="todoedit" method="post" enctype="multipart/form-data" action="/my/todoedit.html" target="_self">
-<input type="hidden" name="todo_id" value="{{.todo.TodoId}}">
-<input type="hidden" name="author_id" value="{{.todo.AuthorId}}">
+<form id="todonew" method="post" enctype="multipart/form-data" action="/my/todonew.html" target="_self">
+<input type="hidden" name="author_id" value="{{.user.UserId}}">
 <fieldset class="flex three-600 one-400">
-  <label><input type="name" placeholder="Имя" name="name" value="{{ .todo.Name }}" autofocus="autofocus" minlength="2" maxlength="128" required="required"></label>
+  <label><input type="text" name="name" placeholder="Описание" autofocus="autofocus" minlength="2" maxlength="128" required="required"></label>
   <label><select title="Выбирайте на кого закрепить задачу" name="perfomer_id">
               <option>Выбрать...</option>
-              {{ $CurrAuthorId := .todo.AuthorId}}
               {{ range .users }}
-              <option value="{{ .UserId }}" {{ if eq $CurrAuthorId .UserId }} selected="selected" {{end}}>{{ .Name }}</option>
+              <option value="{{ .UserId }}">{{ .Name }}</option>
               {{ else }}
               <option value="" disable>Ошибка загрузки пользователей</option>
               {{ end }}
-            </select></label>
-  <!-- <label><  name="status" value="{{.todo.Status}}" placeholder="Состояние"></label> -->
-              {{ $CurrStatus := .todo.Status}}
-    <label><select title="Состояние задачи" name="status">
-              <option>Выбрать...</option>
-              <option value="2" {{ if eq $CurrStatus 2 }} selected="selected" {{end}}>Выполнено</option>
-              <option value="1" {{ if eq $CurrStatus 1 }} selected="selected" {{end}}>Не выполнено</option>
-              <!-- <option value="0" {{ if eq $CurrStatus 0 }} selected="selected" {{end}}>Не применяется</option> -->
-            </select></label>
+            </select>
+  </label>
+  <label>
+    <select title="Состояние задачи" name="status">
+      <option>Выбрать...</option>
+      <option value="2" disabled>Выполнено</option>
+      <option value="1" selected="selected"><b>Не выполнено</b></option>
+      <!-- <option value="0">Не применяется</option> -->
+    </select>
+  </label>
 </fieldset>
-<button class='success' type="submit">Обновить</button>
-<a class='button' href="/my/todolist.html" target="_self" title="не сохранившись перейти мои дела">Закрыть</a>
-<button class="button warning" form="deletetodo" name="todo_id" value="{{ .todo.TodoId }}">Удалить</button>
+<button class="success" type="submit">Создать</button>
+<a class='button warning' href="/my/todolist.html" target="_self" title="не сохранившись перейти мои дела">Отменить</a>
 </form>
 </div>
-
 </article>
 </section>
 </main>
@@ -192,6 +188,7 @@ u('aside a').on('click', function(e){
 u([window]).on('scroll', function(){
   var top = this.scrollY || document.documentElement.scrollTop;
   u('.top').toggleClass('visible', top > 1000);
-}).trigger('scroll');</script>
+}).trigger('scroll');
+</script>
 </body>
 </html>

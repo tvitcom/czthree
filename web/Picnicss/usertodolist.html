@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<title>czthree - Дела пользователя {{ .user.Name }}</title>
+<title>czthree - Дела для пользователя {{ .user.Name }}</title>
 <meta charset="utf-8"><meta name="theme-color" content="#317EFB"/>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="keywords" content="Дела, разместить, бесплатно, Харьков, Украина, купить, рубрика, категория, аренда, авто, велосипед, спорт, услуги, мастера, компьютер, мебель, ремонт">
@@ -126,14 +126,14 @@ aside .links a.button {
       <article class="full four-fifth-1000">
         
 
-<h2 id="tabs">Дела {{ .perfomer.Name }}</h2>
+<h2 id="tabs">Дела для {{ .perfomer.Name }} <b>[<a title="Создать запись новой задачи todo" href="/my/todonew.html">создать запись</a>]</b></h2>
 <table class="primary">
   <thead>
     <tr>
       <th>№</th>
       <th>название</th>
       <th>статус</th>
-      <th>готово</th>
+      <th>действия</th>
     </tr>
   </thead>
   <tbody>
@@ -142,7 +142,7 @@ aside .links a.button {
     <tr>
       <td><a href="/my/todoedit.html?todoid={{ .TodoId }}" title="Открыть" target="_self">{{ .TodoId }}</a></td>
       <td>{{ .Name }}</td>
-      <td>{{ if eq .Status 1 }} задано {{else}} <font color=green>готово</font> {{end}}</td>
+      <td>{{ if eq .Status 1 }} задано {{else if eq .Status 2}} <font color=green>выполнено</font> {{else}} отменено {{end}}</td>
       <td>
           {{if eq $UID 1 }}
         <a href="/my/todoedit.html?todoid={{ .TodoId }}">Изменить</a>

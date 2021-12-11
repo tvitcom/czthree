@@ -376,14 +376,7 @@ func (ag agregator) GetTodoByUserId(ctx context.Context, uid int64) ([]Todo, err
 }
 
 func (ag agregator) DeleteTodoData(ctx context.Context, aid int64) error {
-	aidStr := fmt.Sprint(aid)
-	pathes := config.PictureTodoPath + aidStr + "_*"
-  err := ag.repo.DeleteTodoById(ctx, aid)
-  if err != nil {
-      ag.logger.With(ctx).Error(err.Error())
-      return err
-  }
-	return util.FileDeletionByMask(ctx, pathes)
+	return ag.repo.DeleteTodoById(ctx, aid)
 }
 
 // Create creates a new Todo.

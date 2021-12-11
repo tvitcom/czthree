@@ -27,7 +27,7 @@ type Agregator interface {
 	UpdateTodo(ctx context.Context, fdata *TodoForm) error
 	DeleteTodoData(ctx context.Context, aid int64) error
 	UpdateUser(ctx context.Context, fdata *ProfileForm,uid int64) error
-	CreateTodo(ctx context.Context, f *TodoForm, uid, perfid int64, dt string) (int64, error)
+	CreateTodo(ctx context.Context, f *TodoForm) (int64, error)
 }
 
 type agregator struct {
@@ -56,11 +56,11 @@ type TodoForm struct {
 // Validate validates the TodoForm fields
 func (m TodoForm) Validate() error {
 	return vld.ValidateStruct(&m,
-		vld.Field(&m.TodoId, vld.Required),
+		vld.Field(&m.TodoId, vld.When(m.TodoId != 0, vld.Required)),
 		vld.Field(&m.AuthorId, vld.Required),
-		vld.Field(&m.PerfomerId, vld.Required),//, is.Digit),
-		vld.Field(&m.Name, vld.Required, vld.Length(2, 128)),//, is.Digit),
-		vld.Field(&m.Status, vld.Required),//, is.Digit),
+		vld.Field(&m.PerfomerId, vld.Required),
+		vld.Field(&m.Name, vld.Required, vld.Length(2, 128)),
+		vld.Field(&m.Status, vld.When(m.TodoId != 0, vld.Required)),
 		)
 }
 
@@ -98,7 +98,7 @@ func (m LoginForm) Validate() error {
 func (f TodoStatusForm) Validate() error {
 	return vld.ValidateStruct(&f,
 		vld.Field(&f.TodoId, vld.Required),
-		vld.Field(&f.Status, vld.Required),
+		vld.Field(&f.Status, vld.When(f.Status != 0, vld.Required)),
 	)
 }
 
@@ -266,14 +266,11 @@ func (ag agregator) DeleteTodoData(ctx context.Context, aid int64) error {
 }
 
 // Create creates a new Todo.
-func (ag agregator) CreateTodo(ctx context.Context, f *TodoForm, uid, perfid int64, name string) (int64, error) {
-	if uid == 0 {
-		return 0, errors.New("CreateTodo on User_id:0")
-	}
+func (ag agregator) CreateTodo(ctx context.Context, f *TodoForm) (int64, error) {
 	return ag.repo.CreateTodo(ctx, entity.Todo{
-	  AuthorId: uid,
-	  PerfomerId: perfid,
-	  Name: name,
-	  Status: 1, // todo status:1
+	  AuthorId: f.AuthorId,
+	  PerfomerId: f.PerfomerId,
+	  Name: f.Name,
+	  Status: f.Status,
 	})
 }

@@ -60,7 +60,7 @@ func (res resource) handlerLogin(c *fiber.Ctx) error {
 func (res resource) handlerLogout(c *fiber.Ctx) error {
     deleteJWTCookie(c)
     return c.Render("thanks", fiber.Map{
-        "msg": "за посещение сайта. Удачных сделок!",
+        "msg": "за посещение сайта. Удачных результатов!",
     })
 }
 

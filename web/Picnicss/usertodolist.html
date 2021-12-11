@@ -126,7 +126,7 @@ aside .links a.button {
       <article class="full four-fifth-1000">
         
 
-<h2 id="tabs">Дела для {{ .perfomer.Name }} <b>[<a title="Создать запись новой задачи todo" href="/my/todonew.html">создать запись</a>]</b></h2>
+<h2 id="tabs">Дела для {{ .perfomer.Name }} {{ if eq .user.UserId 1 }}<b>[<a title="Создать запись новой задачи todo" href="/my/todonew.html">создать запись</a>]</b>{{end}}</h2>
 <table class="primary">
   <thead>
     <tr>
@@ -140,7 +140,7 @@ aside .links a.button {
     {{$UID := .user.UserId}}
     {{ range .todosDisplay }}
     <tr>
-      <td><a href="/my/todoedit.html?todoid={{ .TodoId }}" title="Открыть" target="_self">{{ .TodoId }}</a></td>
+      <td>{{ .TodoId }}</td>
       <td>{{ .Name }}</td>
       <td>{{ if eq .Status 1 }} задано {{else if eq .Status 2}} <font color=green>выполнено</font> {{else}} отменено {{end}}</td>
       <td>
